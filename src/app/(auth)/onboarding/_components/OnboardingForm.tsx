@@ -213,7 +213,7 @@ export function OnboardingForm() {
           }}
         />
         <p className="mt-2 text-xs" style={{ color: '#0e120e' }}>
-          Tip: mention domains (AI, Web, IoT), tools, and what you're looking for.
+          Tip: mention domains (AI, Web, IoT), tools, and what youre looking for.
         </p>
         {errors.bio && (
           <p role="alert" className="mt-2 text-xs" style={{ color: '#dc2626' }}>
