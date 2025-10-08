@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Users, Lightbulb, ArrowRight } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface LandingPageProps {
   onGetStarted?: () => void;
@@ -7,7 +9,9 @@ interface LandingPageProps {
 }
 
 export default function LandingPage({ onGetStarted, onExploreProjects }: LandingPageProps) {
+  const router = useRouter();
   const [activeWord, setActiveWord] = useState(0);
+  const {data: session, status} = useSession();
   const words = ['Collaborate', 'Create', 'Build', 'Innovate'];
   
   useEffect(() => {
@@ -15,7 +19,7 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
       setActiveWord((prev) => (prev + 1) % words.length);
     }, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [session]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white overflow-hidden">
@@ -82,9 +86,15 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
             </p>
 
             {/* CTA Buttons - Parent component will handle these */}
+            
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
               <button 
-                onClick={onGetStarted}
+                onClick={
+                  !session?.user
+                    ? onGetStarted
+                    : () => router.push('/dashboard')
+                }
+                  // triggers modal from Home
                 className="group px-8 py-4 rounded-full font-semibold text-neutral-900 transition-all duration-300 flex items-center gap-2 shadow-lg hover:scale-105"
                 style={{
                   background: 'linear-gradient(to right, #A7727D, #EDDBC7)',
@@ -112,7 +122,6 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
         </section>
 
       </div>
-
       {/* Bottom Navigation Bar */}
       <nav className="fixed bottom-7 left-0 right-0 z-50  ">
         <div className="max-w-4xl mx-auto px-6 py-4 bg-neutral-900/80 backdrop-blur-xl border-t border-white/10 shadow-2xl rounded-2xl">
