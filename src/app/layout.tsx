@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} antialiased bg-background font-poppins text-foreground border-border outline-ring/50`}>
+      <body className={`${poppins.className} antialiased font-poppins text-foreground border-border outline-ring/50`}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
