@@ -10,14 +10,13 @@ export default function Home() {
   const router = useRouter();
   const [loginOpen, setLoginOpen] = useState(false);
   console.log(session);
-
   return (
     <>
-      <LandingPage 
+      <LandingPage
         onGetStarted={() => setLoginOpen(true)}
         onExploreProjects={() => router.push('/projects')}
       />
-     <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
 }
