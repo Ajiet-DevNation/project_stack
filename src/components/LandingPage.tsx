@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Users, Lightbulb, ArrowRight } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ThreeBackground from './threejs/ThreeBackground';
 
@@ -141,6 +141,9 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
                 <Users className="w-4 h-4" />
                 <span className="hidden sm:inline">Community</span>
               </a>
+              <div className="text-gray-300 hover:text-white transition-colors flex items-center gap-2">
+                <button className='hidden cursor-pointer sm:inline' onClick={() => signOut()}>Sign-out</button>
+              </div>
             </div>
           </div>
         </div>
