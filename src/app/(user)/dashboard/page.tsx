@@ -6,11 +6,10 @@ const Page = () => {
   const { data: session, status } = useSession(); // session has user info
   return (
     <>
-    <div className='h-screen bg-black text-white'>
+    <div className='h-screen bg-white text-black'>
       <div className='  flex justify-center '>Hi {session?.user.name}</div>
-     This screen is dark, cold… just like your career path after that choosing AJIET.
+     This screen is light, warm… just like your career path after that choosing AJIET.
     </div>
-      
     </>
   )
 }
