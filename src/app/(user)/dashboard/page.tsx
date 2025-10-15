@@ -3,7 +3,8 @@ import { useSession } from 'next-auth/react'
 import React from 'react'
 
 const Page = () => {
-  const { data: session, status } = useSession(); // session has user info
+  const { data: session, status } = useSession(); // session has user info      // user is not authenticated
+
   return (
     <>
     <div className='h-screen bg-white text-black'>

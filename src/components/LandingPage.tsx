@@ -14,6 +14,7 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
   const [activeWord, setActiveWord] = useState(0);
   const {data: session, status} = useSession();
   const words = ['Collaborate', 'Create', 'Build', 'Innovate'];
+
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,7 +22,7 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
     }, 2000);
     return () => clearInterval(interval);
   }, [session]);
-
+  
   return (
     <div className="min-h-screen text-white relative">
       <ThreeBackground />

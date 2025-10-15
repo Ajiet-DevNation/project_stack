@@ -1,11 +1,8 @@
-// import { db } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../auth/[...nextauth]/route"; 
 
-// export async function GET() {
-//   const users = await db.user.findMany({
-//     include: { projects: true, contributions: true },
-//   });
-//   return new Response(JSON.stringify({ success: true, users }), {
-//     status: 200,
-//     headers: { "Content-Type": "application/json" },
-//   });
-// }
+export async function GET(req: Request) {
+  const session = await getServerSession(authOptions);
+  console.log("DEBUG SESSION:", session);
+  return new Response(JSON.stringify(session), { status: 200 });
+}

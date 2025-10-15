@@ -6,10 +6,13 @@ import LandingPage from "@/components/LandingPage";
 import { LoginModal } from "@/components/LoginModal";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session} = useSession();
   const router = useRouter();
   const [loginOpen, setLoginOpen] = useState(false);
+  // if(status === "loading") return <div>Loading...</div>;
+  // if(!session) return <div>Not logged in</div>;
   console.log(session);
+
 
   return (
     <>

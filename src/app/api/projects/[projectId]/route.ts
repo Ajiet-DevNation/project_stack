@@ -2,22 +2,23 @@ import { db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { z } from "zod";
-import { projectSchema } from "../route"; 
+import { projectSchema } from "../route";
 import { NextResponse } from "next/server";
 
-const updateProjectSchema = projectSchema.partial(); 
-
+const updateProjectSchema = projectSchema.partial();
 
 export async function GET(
   req: Request,
   { params }: { params: { projectId: string } }
 ) {
   try {
-    const projectId = z.string().cuid().parse(params.projectId);
+    const { projectId } = await params;
+
+    const validatedProjectId = z.string().cuid().parse(projectId);
     const project = await db.project.findUnique({
-      where: { id: projectId },
+      where: { id: validatedProjectId },
       include: {
-        author: true, 
+        author: true,
         comments: true,
         likes: true,
       },
@@ -30,7 +31,6 @@ export async function GET(
   }
 }
 
-
 export async function PATCH(
   req: Request,
   { params }: { params: { projectId: string } }
@@ -39,15 +39,16 @@ export async function PATCH(
     const session = await getServerSession(authOptions);
     if (!session?.user?.id)
       return new Response("Unauthorized", { status: 401 });
+    
+    // FIX: Await and destructure the projectId correctly
+    const { projectId } = await params;
+    const validatedProjectId = z.string().cuid().parse(projectId);
 
-    const projectId = z.string().cuid().parse(params.projectId);
-
-    // Security: Verify the user is the author of the project before updating
     const userProfile = await db.profile.findUnique({
       where: { userId: session.user.id },
     });
     const project = await db.project.findFirst({
-      where: { id: projectId, authorId: userProfile?.id },
+      where: { id: validatedProjectId, authorId: userProfile?.id },
     });
 
     if (!project) return new Response("Forbidden", { status: 403 });
@@ -56,7 +57,7 @@ export async function PATCH(
     const parsedData = updateProjectSchema.parse(body);
 
     const updatedProject = await db.project.update({
-      where: { id: projectId },
+      where: { id: validatedProjectId },
       data: parsedData,
     });
     return new Response(JSON.stringify(updatedProject));
@@ -65,7 +66,6 @@ export async function PATCH(
     return NextResponse.json({ err }, { status: 500 });
   }
 }
-
 
 export async function DELETE(
   req: Request,
@@ -76,19 +76,20 @@ export async function DELETE(
     if (!session?.user?.id)
       return new Response("Unauthorized", { status: 401 });
 
-    const projectId = z.string().cuid().parse(params.projectId);
+    // FIX: Await and destructure the projectId
+    const { projectId } = await params;
+    const validatedProjectId = z.string().cuid().parse(projectId);
 
-    // Security: Verify the user is the author of the project before deleting
     const userProfile = await db.profile.findUnique({
       where: { userId: session.user.id },
     });
     const project = await db.project.findFirst({
-      where: { id: projectId, authorId: userProfile?.id },
+      where: { id: validatedProjectId, authorId: userProfile?.id },
     });
 
     if (!project) return new Response("Forbidden", { status: 403 });
 
-    await db.project.delete({ where: { id: projectId } });
+    await db.project.delete({ where: { id: validatedProjectId } });
     return new Response(null, { status: 204 });
   } catch (error) {
     const err = error instanceof Error ? error.message : "Unknown error";
