@@ -146,6 +146,7 @@ model Application {
   profileId String
   projectId String
   appliedAt DateTime @default(now())
+  status String @default("Pending")
 
   applicant Profile @relation(fields: [profileId], references: [id], onDelete: Cascade) // FIX: Renamed relation from 'profile' to 'applicant'
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
