@@ -11,8 +11,8 @@ export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
     GithubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
+      clientId: process.env.AUTH_GITHUB_ID!,
+      clientSecret: process.env.AUTH_GITHUB_SECRET!,
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
   // Callbacks to control and customize the session flow
   callbacks: {
     // This callback runs whenever a JWT is created or updated.
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       // 1. On initial sign-in, add user data to the token
       if (user) {
         token.id = user.id;
@@ -36,8 +36,8 @@ export const authOptions: NextAuthOptions = {
         const dbUser = await db.user.findUnique({ where: { id: user.id } });
         token.onboarded = dbUser?.onboarded ?? false;
       }
-      // 2. On subsequent requests, refresh the token with the latest data
-      else {
+      // 2. Only refresh from DB on explicit update triggers, not on every request
+      else if (trigger === "update") {
         const dbUser = await db.user.findUnique({
           where: { id: token.id as string },
         });
@@ -58,10 +58,8 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-
-  // You can specify a custom sign-in page if you have one
   pages: {
-    signIn: "/sign-in", // Example custom sign-in page
+    signIn: "/",
   },
 };
 

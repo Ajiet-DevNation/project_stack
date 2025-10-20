@@ -25,7 +25,6 @@ export async function POST(req: Request) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    // Find the user's profile, which is the author
     const userProfile = await db.profile.findUnique({
       where: { userId: session.user.id },
     });
@@ -40,7 +39,6 @@ export async function POST(req: Request) {
     const newProject = await db.project.create({
       data: {
         ...parsedData,
-        // Connect the project to the author's Profile ID
         author: {
           connect: { id: userProfile.id },
         },
@@ -60,19 +58,51 @@ export async function POST(req: Request) {
 // GET: Fetch a list of all projects
 export async function GET(req: Request) {
   try {
-    // Logic for pagination, filtering, and searching
-    const where: Prisma.ProjectWhereInput = { /* ... */ };
+    const url = new URL(req.url);
+
+    // Pagination
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+
+    // Filtering & Searching
+    const projectStatus = url.searchParams.get("projectStatus");
+    const skills = url.searchParams.get("skills");
+    const search = url.searchParams.get("search");
+
+    const where: Prisma.ProjectWhereInput = {};
+
+    if (projectStatus) {
+      where.projectStatus = projectStatus;
+    }
+    if (skills) {
+      where.requiredSkills = { hasSome: skills.split(',') };
+    }
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
+    }
 
     const projects = await db.project.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
       where,
       orderBy: { postedOn: "desc" },
       include: {
-        // Include the author's profile information
         author: {
           select: {
             id: true,
             name: true,
             image: true,
+          },
+        },
+        // Include the count of related records
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+            contributors: true,
           },
         },
       },
