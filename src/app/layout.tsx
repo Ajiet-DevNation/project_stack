@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/authProvider";
+import { ThemeProvider } from "./theme-providers";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -21,8 +22,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} antialiased font-poppins text-foreground border-border outline-ring/50`}>
-        <AuthProvider>{children}</AuthProvider>
+      <body
+        className={`${poppins.className} antialiased font-poppins text-foreground border-border outline-ring/50`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

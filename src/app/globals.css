@@ -1,101 +1,154 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+@import "tw-animate-css"; /* <-- Added from file 1 */
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *)); /* <-- Added from file 1 */
 
+/* ============================================
+   PRIORITY THEME VARIABLES
+   (From file 2, as requested)
+   ============================================ */
 :root {
-  /* Old color palette */
-  --old-color-primary: #819A91;
-  --old-color-secondary: #A7C1A8;
-  --old-color-accent: #D1D8BE;
-  --old-color-background: #EEEFE0;
+  /* --- Comprehensive theme from file 2 --- */
+  --card: #fcfcfc;
+  --ring: #644a40;
+  --input: #d8d8d8;
+  --muted: #efefef;
+  --accent: #e8e8e8;
+  --border: #d8d8d8;
+  --radius: 0.5rem;
+  --chart-1: #644a40;
+  --chart-2: #ffdfb5;
+  --chart-3: #e8e8e8;
+  --chart-4: #ffe6c4;
+  --chart-5: #66493e;
+  --popover: #fcfcfc;
+  --primary: #644a40;
+  --sidebar: #fbfbfb;
+  --secondary: #ffdfb5;
+  --background: #f9f9f9;
+  --foreground: #202020;
+  --destructive: #e54d2e;
+  --sidebar-ring: #b5b5b5;
+  --sidebar-accent: #f7f7f7;
+  --sidebar-border: #ebebeb;
+  --card-foreground: #202020;
+  --sidebar-primary: #343434;
+  --muted-foreground: #646464;
+  --accent-foreground: #202020;
+  --popover-foreground: #202020;
+  --primary-foreground: #ffffff;
+  --sidebar-foreground: #252525;
+  --secondary-foreground: #582d1d;
+  --destructive-foreground: #ffffff;
+  --sidebar-accent-foreground: #343434;
+  --sidebar-primary-foreground: #fbfbfb;
 
-  /* New collaborative theme: #A7727D #EDDBC7 #F8EAD8 #F9F5E7 */
-  --theme-background: #F9F5E7;
-  --theme-foreground: #A7727D;
-  --theme-card: #F8EAD8;
-  --theme-card-foreground: #A7727D;
-  --theme-popover: #F8EAD8;
-  --theme-popover-foreground: #A7727D;
-  --theme-primary: #A7727D; /* Darker shade for primary actions */
-  --theme-primary-foreground: #F9F5E7;
-  --theme-secondary: #EDDBC7; /* Lighter shade for secondary actions */
-  --theme-secondary-foreground: #A7727D;
-  --theme-muted: #EDDBC7;
-  --theme-muted-foreground: #A7727D;
-  --theme-accent: #A7727D; /* Darker shade for accents */
-  --theme-accent-foreground: #F9F5E7;
-  --theme-destructive: #dc3545;
-  --theme-destructive-foreground: #ffffff;
-  --theme-border: #EDDBC7;
-  --theme-input: #EDDBC7;
-  --theme-ring: #A7727D;
-
-  --background: var(--theme-background);
-  --foreground: var(--theme-foreground);
-  --card: var(--theme-card);
-  --card-foreground: var(--theme-card-foreground);
-  --popover: var(--theme-popover);
-  --popover-foreground: var(--theme-popover-foreground);
-  --primary: var(--theme-primary);
-  --primary-foreground: var(--theme-primary-foreground);
-  --secondary: var(--theme-secondary);
-  --secondary-foreground: var(--theme-secondary-foreground);
-  --muted: var(--theme-muted);
-  --muted-foreground: var(--theme-muted-foreground);
-  --accent: var(--theme-accent);
-  --accent-foreground: var(--theme-accent-foreground);
-  --destructive: var(--theme-destructive);
-  --destructive-foreground: var(--theme-destructive-foreground);
-  --border: var(--theme-border);
-  --input: var(--theme-input);
-  --ring: var(--theme-ring);
-
-  --chart-1: var(--theme-primary);
-  --chart-2: var(--theme-secondary);
-  --chart-3: #6f42c1;
-  --chart-4: #20c997;
-  --chart-5: #fd7e14;
-
-  --radius: 0.625rem;
-  --sidebar: var(--theme-card);
-  --sidebar-foreground: var(--theme-foreground);
-  --sidebar-primary: var(--theme-primary);
-  --sidebar-primary-foreground: var(--theme-primary-foreground);
-  --sidebar-accent: var(--theme-accent);
-  --sidebar-accent-foreground: var(--theme-accent-foreground);
-  --sidebar-border: var(--theme-border);
-  --sidebar-ring: var(--theme-ring);
+  /* --- Glow effects from file 2 --- */
+  --glow-minty: 0 0 20px hsl(159 31% 80% / 0.6),
+    0 0 40px hsl(159 31% 80% / 0.3);
+  --glow-primary: 0 0 20px hsl(32 28% 23% / 0.6),
+    0 0 40px hsl(32 28% 23% / 0.3);
 }
 
 .dark {
-  --background: var(--theme-background);
-  --foreground: var(--theme-foreground);
-  --card: var(--theme-card);
-  --card-foreground: var(--theme-card-foreground);
-  --popover: var(--theme-popover);
-  --popover-foreground: var(--theme-popover-foreground);
-  --primary: var(--theme-primary);
-  --primary-foreground: var(--theme-primary-foreground);
-  --secondary: var(--theme-secondary);
-  --secondary-foreground: var(--theme-secondary-foreground);
-  --muted: var(--theme-muted);
-  --muted-foreground: var(--theme-muted-foreground);
-  --accent: var(--theme-accent);
-  --accent-foreground: var(--theme-accent-foreground);
-  --destructive: var(--theme-destructive);
-  --border: var(--theme-border);
-  --input: var(--theme-input);
-  --ring: var(--theme-ring);
-
-  --chart-1: var(--theme-primary);
-  --chart-2: var(--theme-secondary);
-  --chart-3: #6f42c1;
-  --chart-4: #20c997;
-  --chart-5: #fd7e14;
+  /* --- Comprehensive dark theme from file 2 --- */
+  --card: #191919;
+  --ring: #ffe0c2;
+  --input: #484848;
+  --muted: #222222;
+  --accent: #2a2a2a;
+  --border: #201e18;
+  --radius: 0.5rem;
+  --chart-1: #ffe0c2;
+  --chart-2: #393028;
+  --chart-3: #2a2a2a;
+  --chart-4: #42382e;
+  --chart-5: #ffe0c1;
+  --popover: #191919;
+  --primary: #ffe0c2;
+  --sidebar: #18181b;
+  --secondary: #393028;
+  --background: #111111;
+  --foreground: #eeeeee;
+  --destructive: #e54d2e;
+  --sidebar-ring: #d4d4d8;
+  --sidebar-accent: #27272a;
+  --sidebar-border: #27272a;
+  --card-foreground: #eeeeee;
+  --sidebar-primary: #1d4ed8;
+  --muted-foreground: #b4b4b4;
+  --accent-foreground: #eeeeee;
+  --popover-foreground: #eeeeee;
+  --primary-foreground: #081a1b;
+  --sidebar-foreground: #f4f4f5;
+  --secondary-foreground: #ffe0c2;
+  --destructive-foreground: #ffffff;
+  --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-primary-foreground: #ffffff;
 }
 
+/* ============================================
+   THEME MAPPING
+   (From file 2)
+   ============================================ */
+@theme inline {
+  /* --- Colors from file 2 --- */
+  --color-card: var(--card);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-radius: var(--radius);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-popover: var(--popover);
+  --color-primary: var(--primary);
+  --color-sidebar: var(--sidebar);
+  --color-secondary: var(--secondary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-card-foreground: var(--card-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+
+  /* --- Fonts from file 2 --- */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-inter: var(--font-inter);
+}
+
+/* ============================================
+   BODY STYLES
+   (From file 2)
+   ============================================ */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+/* ============================================
+   MERGED UTILITY CLASSES & ANIMATIONS
+   (From both files)
+   ============================================ */
 @layer utilities {
+  /* --- Utilities from file 1 --- */
   .vignette {
     background: radial-gradient(
       120% 90% at 50% 10%,
@@ -103,5 +156,125 @@
       transparent 40%,
       color(display-p3 0 0 0 / 0.4) 100%
     );
+  }
+
+  /* --- Utilities from file 2 --- */
+  /* Glass morphism card effect */
+  .glass-card {
+    @apply bg-white/80 border border-foreground/10;
+  }
+
+  /* Text glow effect on hover */
+  .name-glow {
+    transition: text-shadow 0.3s ease, color 0.3s ease;
+  }
+
+  .name-glow:hover {
+    text-shadow: 
+      0 0 10px rgba(189, 156, 122, 0.8),
+      0 0 20px rgba(189, 156, 122, 0.6),
+      0 0 30px rgba(189, 156, 122, 0.4),
+      0 0 40px rgba(189, 156, 122, 0.3);
+    color: #EBDEBE;
+  }
+
+  /* Permanent glow effects */
+  .text-glow-primary {
+    text-shadow: var(--glow-primary);
+  }
+
+  .text-glow-minty {
+    text-shadow: var(--glow-minty);
+  }
+
+  /* Floating animation */
+  .floating {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  /* Hover lift effect - elements rise on hover */
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  /* Fade in from bottom animation */
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Staggered animation delays */
+  .delay-100 {
+    animation-delay: 0.1s;
+  }
+  .delay-200 {
+    animation-delay: 0.2s;
+  }
+  .delay-300 {
+    animation-delay: 0.3s;
+  }
+  .delay-400 {
+    animation-delay: 0.4s;
+  }
+  .delay-500 {
+    animation-delay: 0.5s;
+  }
+  .delay-600 {
+    animation-delay: 0.6s;
+  }
+  .delay-700 {
+    animation-delay: 0.7s;
+  }
+  .delay-800 {
+    animation-delay: 0.8s;
+  }
+  .delay-900 {
+    animation-delay: 0.9s;
+  }
+  .delay-1000 {
+    animation-delay: 1s;
+  }
+  .delay-1200 {
+    animation-delay: 1.2s;
+  }
+  .delay-1500 {
+    animation-delay: 1.5s;
+  }
+  .delay-2000 {
+    animation-delay: 2s;
+  }
+
+  /* Animation duration classes for shader effects */
+  .animate-duration-3s {
+    animation-duration: 3s;
+  }
+  
+  .animate-duration-2s {
+    animation-duration: 2s;
+  }
+  
+  .animate-duration-4s {
+    animation-duration: 4s;
   }
 }
