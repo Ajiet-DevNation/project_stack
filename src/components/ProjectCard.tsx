@@ -3,6 +3,7 @@
 import { ProjectCard as ProjectShowcaseCard } from "@/components/ui/card-7";
 import { useEffect, useState } from "react";
 import { Code2 } from "lucide-react";
+import Loader from "./Loader";
 
 interface Project {
   id: string;
@@ -62,9 +63,9 @@ export default function ProjectCard() {
 
   if (loading) {
     return (
-      <div className="relative z-0 flex min-h-screen w-full items-center justify-center  p-4">
+      <div className="relative z-0 flex min-h-screen w-full items-center justify-center p-4">
         {/* Updated this line to use the theme's foreground color */}
-        <p className="text-foreground">Loading projects...</p>
+        <Loader />
       </div>
     );
   }

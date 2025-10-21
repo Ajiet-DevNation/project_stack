@@ -13,11 +13,13 @@ import {
   Children,
   cloneElement,
   createContext,
+  isValidElement,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
+  type ReactElement,
 } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -34,10 +36,6 @@ type DockProps = {
   magnification?: number;
   spring?: SpringOptions;
 };
-// type DockItemProps = {
-//   className?: string;
-//   children: React.ReactNode;
-// };
 type DockLabelProps = {
   className?: string;
   children: React.ReactNode;
@@ -96,7 +94,7 @@ function Dock({
         height: height,
         scrollbarWidth: 'none',
       }}
-      className='mx-2 flex max-w-full items-end overflow-x-auto'
+      className='flex w-3xl items-end justify-center overflow-x-auto px-2'
     >
       <motion.div
         onMouseMove={({ pageX }) => {
@@ -108,7 +106,7 @@ function Dock({
           mouseX.set(Infinity);
         }}
         className={cn(
-          'mx-auto flex w-fit gap-4 rounded-2xl bg-gray-50 px-4 dark:bg-neutral-900',
+          'mx-auto flex w-full gap-4 rounded-2xl bg-card border border-border px-4',
           className
         )}
         style={{ height: panelHeight }}
@@ -123,65 +121,24 @@ function Dock({
   );
 }
 
-// function DockItem({ children, className }: DockItemProps) {
-//   const ref = useRef<HTMLDivElement>(null);
+type DockItemChildProps = {
+  width: MotionValue<number>;
+  isHovered: MotionValue<number>;
+};
 
-//   const { distance, magnification, mouseX, spring } = useDock();
-
-//   const isHovered = useMotionValue(0);
-
-//   const mouseDistance = useTransform(mouseX, (val) => {
-//     const domRect = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-//     return val - domRect.x - domRect.width / 2;
-//   });
-
-//   const widthTransform = useTransform(
-//     mouseDistance,
-//     [-distance, 0, distance],
-//     [40, magnification, 40]
-//   );
-
-//   const width = useSpring(widthTransform, spring);
-
-//   return (
-//     <motion.div
-//       ref={ref}
-//       style={{ width }}
-//       onHoverStart={() => isHovered.set(1)}
-//       onHoverEnd={() => isHovered.set(0)}
-//       onFocus={() => isHovered.set(1)}
-//       onBlur={() => isHovered.set(0)}
-//       className={cn(
-//         'relative inline-flex items-center justify-center',
-//         className
-//       )}
-//       tabIndex={0}
-//       role='button'
-//       aria-haspopup='true'
-//     >
-//       {Children.map(children, (child) =>
-//         cloneElement(child as React.ReactElement, { width, isHovered } as any)
-//       )}
-//     </motion.div>
-//   );
-// }
-
-// In src/components/ui/dock.tsx
-
-// (Make sure the type definition for DockItemProps is also updated)
 type DockItemProps = {
   className?: string;
   children: React.ReactNode;
   magnification?: number;
+  baseWidth?: number;
 };
 
-// Replace the old DockItem function with this one:
 function DockItem({
   children,
   className,
   baseWidth = 40,
   magnification: itemMagnification,
-}: DockItemProps & { baseWidth?: number }) {
+}: DockItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { distance, magnification: dockMagnification, mouseX, spring } = useDock();
   const finalMagnification = itemMagnification ?? dockMagnification;
@@ -214,9 +171,16 @@ function DockItem({
       role="button"
       aria-haspopup="true"
     >
-      {Children.map(children, (child) =>
-        cloneElement(child as React.ReactElement, { width, isHovered } as any)
-      )}
+      {Children.map(children, (child) => {
+        if (!isValidElement(child)) {
+          return child;
+        }
+
+        return cloneElement(child as ReactElement<DockItemChildProps>, {
+          width,
+          isHovered,
+        });
+      })}
     </motion.div>
   );
 }
@@ -243,7 +207,7 @@ function DockLabel({ children, className, ...rest }: DockLabelProps) {
           exit={{ opacity: 0, y: 0 }}
           transition={{ duration: 0.2 }}
           className={cn(
-            'absolute -top-6 left-1/2 w-fit whitespace-pre rounded-md border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-neutral-700 dark:border-neutral-900 dark:bg-neutral-800 dark:text-white',
+            'absolute -top-6 left-1/2 w-fit whitespace-pre rounded-md border border-border bg-popover px-2 py-0.5 text-xs text-popover-foreground',
             className
           )}
           role='tooltip'

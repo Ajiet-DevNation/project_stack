@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/authProvider";
 import { ThemeProvider } from "./theme-providers";
+import { ClientLayoutShell } from "@/components/ClientLayoutShell";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -14,6 +15,8 @@ export const metadata: Metadata = {
   title: "Project Stack",
   description: "Collaborate on projects seamlessly with Project Stack.",
 };
+
+
 
 export default function RootLayout({
   children,
@@ -31,7 +34,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <ClientLayoutShell>{children}</ClientLayoutShell>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -11,7 +11,7 @@ export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
   // if(status === "loading") return <div>Loading...</div>;
   // if(!session) return <div>Not logged in</div>;
-  console.log(session);
+  // console.log(session);
 
 
   return (

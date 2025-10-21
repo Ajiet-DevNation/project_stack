@@ -13,10 +13,10 @@ export default function Home() {
           {" "}
           {/* Add some padding */}
           <h1 className="text-6xl font-bold text-foreground md:text-6xl">
-            Projects
+            Community Projects
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
-            A collection of my recent work and personal experiments.
+            the project the community is building
           </p>
           {/* PASS THE PROJECT DATA TO THE COMPONENT 
             Using the spread operator {...myProject} is a clean
