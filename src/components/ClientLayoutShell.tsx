@@ -9,7 +9,7 @@ type ClientLayoutShellProps = {
 
 export function ClientLayoutShell({ children }: ClientLayoutShellProps) {
   const pathname = usePathname();
-  const isEntryPage = pathname === "/" || "/onboarding";
+  const isEntryPage = pathname === "/" || pathname === "/onboarding";
 
   return (
     <>

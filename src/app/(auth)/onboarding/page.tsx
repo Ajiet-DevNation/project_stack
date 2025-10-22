@@ -9,13 +9,13 @@ export default function OnboardingPage() {
       <main className="relative z-0 min-h-dvh">
         <section className="mx-auto w-full max-w-4xl px-4 py-10 md:py-14">
           <header className="mb-8">
-            <div className="mb-3 inline-flex items-center rounded-md px-3 py-1 text-xs font-medium bg-background/20 backdrop-blur-sm border border-border/20 text-foreground">
+            <div className="mb-3 inline-flex items-center rounded-md px-3 py-1 text-xs font-medium font-serif bg-background/20 backdrop-blur-sm border border-border/20 text-foreground">
               ProjectStack — College Project Management Platform
             </div>
-            <h1 className="text-pretty text-3xl font-semibold leading-tight md:text-4xl text-foreground">
+            <h1 className="text-pretty text-3xl font-serif leading-tight md:text-4xl text-foreground">
               Share, discover, and collaborate on real-time student projects
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 md:text-base text-muted-foreground">
+            <p className="mt-3 max-w-2xl text-sm leading-6 md:text-base font-serif text-muted-foreground">
               A collaborative platform for university students to showcase work, find contributors, and build a mini
               project portfolio.
             </p>

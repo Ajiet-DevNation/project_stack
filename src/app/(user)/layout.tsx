@@ -1,6 +1,4 @@
-import Navbar from "@/components/Navbar"; // adjust path as needed
-
-export default function RootLayout({
+export default function UserLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
