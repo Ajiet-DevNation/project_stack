@@ -10,7 +10,6 @@ export default function RootLayout({
       <main className="flex-1 pb-32">
         {children}
       </main>
-      {/* <Navbar /> */}
     </div>
   );
 }
