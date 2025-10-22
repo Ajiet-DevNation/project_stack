@@ -17,12 +17,34 @@ export async function GET(
     const validatedProjectId = z.string().cuid().parse(projectId);
     const project = await db.project.findUnique({
       where: { id: validatedProjectId },
+      // --- UPDATED INCLUDE BLOCK ---
       include: {
-        author: true,
-        comments: true,
-        likes: true,
+        author: true, // Gets the full author profile
+        likes: {
+          select: { profileId: true }, // Gets who liked it
+        },
+        comments: {
+          include: {
+            author: { // Gets the author of each comment
+              select: { id: true, name: true, image: true },
+            },
+          },
+        },
+        contributors: {
+          include: {
+            user: { // 'user' is the relation name to the Profile
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
       },
+      // --- END OF UPDATED BLOCK ---
     });
+
     if (!project) return new Response("Project not found", { status: 404 });
     return new Response(JSON.stringify(project));
   } catch (error) {
@@ -40,7 +62,6 @@ export async function PATCH(
     if (!session?.user?.id)
       return new Response("Unauthorized", { status: 401 });
     
-    // FIX: Await and destructure the projectId correctly
     const { projectId } = await params;
     const validatedProjectId = z.string().cuid().parse(projectId);
 
@@ -76,7 +97,6 @@ export async function DELETE(
     if (!session?.user?.id)
       return new Response("Unauthorized", { status: 401 });
 
-    // FIX: Await and destructure the projectId
     const { projectId } = await params;
     const validatedProjectId = z.string().cuid().parse(projectId);
 
