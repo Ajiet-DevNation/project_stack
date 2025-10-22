@@ -9,12 +9,12 @@ type ClientLayoutShellProps = {
 
 export function ClientLayoutShell({ children }: ClientLayoutShellProps) {
   const pathname = usePathname();
-  const isLandingPage = pathname === "/";
+  const isEntryPage = pathname === "/" || "/onboarding";
 
   return (
     <>
       {children}
-      {!isLandingPage && <ProjectStackDock />}
+      {!isEntryPage && <ProjectStackDock />}
     </>
   );
 }

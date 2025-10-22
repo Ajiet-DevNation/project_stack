@@ -7,9 +7,9 @@ const Page = () => {
 
   return (
     <>
-    <div className='h-screen bg-white text-black'>
+    <div className='h-screen bg-background '>
       <div className='  flex justify-center '>Hi {session?.user.name}</div>
-     This screen is light, warm… just like your career path after that choosing AJIET.
+     This screen is dark, just like your career path after choosing AJIET.
     </div>
     </>
   )

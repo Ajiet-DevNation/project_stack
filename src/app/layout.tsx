@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${poppins.className} antialiased font-poppins text-foreground border-border outline-ring/50`}
       >
@@ -33,6 +33,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          
         >
           <AuthProvider>
             <ClientLayoutShell>{children}</ClientLayoutShell>

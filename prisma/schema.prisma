@@ -7,41 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/////////////////////
-// Auth & User Models
-/////////////////////
-
 model User {
   id            String    @id @default(cuid())
   name          String?
-  username      String?   @unique
   email         String?   @unique
-  emailVerified DateTime?
   image         String?
-  onboarded     Boolean   @default(false)
   createdAt     DateTime  @default(now())
-
-  // RELATIONS
-  accounts Account[]
-  sessions Session[]
-  profile  Profile?
+  emailVerified DateTime?
+  onboarded     Boolean   @default(false)
+  username      String?   @unique
+  accounts      Account[]
+  profile       Profile?
+  sessions      Session[]
 }
 
-// ... Account, Session, and VerificationToken models are correct and unchanged ...
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
@@ -57,55 +51,47 @@ model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
+
   @@unique([identifier, token])
 }
 
-/////////////////////
-// Profile & ProjectStack Models
-/////////////////////
-
 model Profile {
-  id      String   @id @default(cuid())
-  name    String
-  image   String?
-  section String
-  branch  String
-  year    String
-  skills  String[]
-  bio     String?
-  userId  String   @unique
-
-  // RELATIONS
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projects      Project[]     @relation("ProjectAuthor") // FIX: Added relation name for clarity
+  id            String        @id @default(cuid())
+  name          String
+  image         String?
+  section       String
+  branch        String
+  year          String
+  skills        String[]
+  bio           String?
+  userId        String        @unique
   applications  Application[]
-  comments      Comment[]     // FIX: Moved from User to Profile
-  likes         Like[]        // FIX: Moved from User to Profile
-  contributions Contributor[] // FIX: Moved from User to Profile
+  comments      Comment[]
+  contributions Contributor[]
+  likes         Like[]
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects      Project[]     @relation("ProjectAuthor")
 }
 
 model Project {
-  id             String   @id @default(cuid())
+  id             String        @id @default(cuid())
   title          String
   description    String
-  requiredSkills String[]
-  startDate      DateTime
-  endDate        DateTime
-  postedOn       DateTime @default(now())
-  githubLink     String?
   liveUrl        String?
   thumbnail      String?
+  authorId       String
+  endDate        DateTime
+  githubLink     String?
+  isActive       Boolean       @default(true)
+  postedOn       DateTime      @default(now())
   projectStatus  String
-  isActive       Boolean @default(true)
-
-  authorId String // FIX: Renamed from userId for clarity
-  author   Profile  @relation("ProjectAuthor", fields: [authorId], references: [id], onDelete: Cascade) // FIX: Renamed from 'user' to 'author'
-
-  // RELATIONS
-  comments     Comment[]
-  likes        Like[]
-  contributors Contributor[]
-  applicants   Application[]
+  requiredSkills String[]
+  startDate      DateTime
+  applicants     Application[]
+  comments       Comment[]
+  contributors   Contributor[]
+  likes          Like[]
+  author         Profile       @relation("ProjectAuthor", fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -113,19 +99,17 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
   projectId String
-  profileId String   // FIX: Renamed from userId and now points to Profile
-
-  author  Profile @relation(fields: [profileId], references: [id], onDelete: Cascade) // FIX: Relation changed from User to Profile and named 'author'
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  profileId String
+  author    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model Like {
   id        String  @id @default(cuid())
   projectId String
-  profileId String  // FIX: Renamed from userId and now points to Profile
-
-  user    Profile @relation(fields: [profileId], references: [id], onDelete: Cascade) // FIX: Relation changed from User to Profile
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  profileId String
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([profileId, projectId])
 }
@@ -133,10 +117,9 @@ model Like {
 model Contributor {
   id        String  @id @default(cuid())
   projectId String
-  profileId String  // FIX: Renamed from userId and now points to Profile
-
-  user    Profile @relation(fields: [profileId], references: [id], onDelete: Cascade) // FIX: Relation changed from User to Profile
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  profileId String
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([profileId, projectId])
 }
@@ -146,10 +129,9 @@ model Application {
   profileId String
   projectId String
   appliedAt DateTime @default(now())
-  status String @default("Pending")
-
-  applicant Profile @relation(fields: [profileId], references: [id], onDelete: Cascade) // FIX: Renamed relation from 'profile' to 'applicant'
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status    String   @default("Pending")
+  applicant Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([profileId, projectId])
 }
