@@ -63,7 +63,7 @@ export default function ProjectCard() {
 
   if (loading) {
     return (
-      <div className="relative z-0 flex min-h-screen w-full items-center justify-center p-4">
+      <div className="relative z-10 flex min-h-screen w-full items-center justify-center p-4">
         {/* Updated this line to use the theme's foreground color */}
         <Loader />
       </div>

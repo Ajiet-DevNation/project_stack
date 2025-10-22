@@ -55,12 +55,6 @@ export function ProjectStackDock() {
         </DockItem>
         <DockItem>
           <DockIcon>
-            <Home />
-          </DockIcon>
-          <DockLabel>Home</DockLabel>
-        </DockItem>
-        <DockItem>
-          <DockIcon>
             <Search />
           </DockIcon>
           <DockLabel>Search</DockLabel>
