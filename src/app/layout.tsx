@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/authProvider";
+import { ThemeProvider } from "./theme-providers";
+import { ClientLayoutShell } from "@/components/ClientLayoutShell";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -14,6 +16,8 @@ export const metadata: Metadata = {
   description: "Collaborate on projects seamlessly with Project Stack.",
 };
 
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,8 +25,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} antialiased font-poppins text-foreground border-border outline-ring/50`}>
-        <AuthProvider>{children}</AuthProvider>
+      <body
+        className={`${poppins.className} antialiased font-poppins text-foreground border-border outline-ring/50`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <ClientLayoutShell>{children}</ClientLayoutShell>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
