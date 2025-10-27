@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import { User, GraduationCap, Building2, Calendar, MapPin, FileText, Sparkles, X, Plus, Play } from "lucide-react"
+import axios from "axios";
 
 const schema = z.object({
   name: z.string().min(2, "Please enter your full name"),
@@ -111,8 +112,10 @@ export function OnboardingForm() {
   }
 
   const onSubmit = async (data: FormValues) => {
-    console.log("[v0] Onboarding submit:", data)
-    reset()
+    console.log("[v0] Onboarding submit:", data);
+    const updatedData = await axios.post("/api/profile", data);
+    console.log(updatedData);
+    reset();
     setCurrentStep(-1) // Return to welcome screen
   }
 
