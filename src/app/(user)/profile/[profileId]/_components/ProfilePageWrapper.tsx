@@ -6,7 +6,7 @@ import Loader from "@/components/Loader"
 import ProfileContent from "./ProfileContent";
 
 interface ProfilePageWrapperProps {
-  profileId: string
+  profileId?: string
 }
 
 function ProfilePageWrapper({ profileId }: ProfilePageWrapperProps) {

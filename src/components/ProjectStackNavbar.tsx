@@ -4,6 +4,7 @@ import { Dock, DockItem, DockIcon, DockLabel } from "@/components/ui/dock";
 import { LogOut, Home, Plus, Inbox, Search } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils"; // Import cn for managing classes
+import { signOut } from "next-auth/react";
 
 // Updated to use theme colors
 const DockLogo = () => (
@@ -67,7 +68,10 @@ export function ProjectStackDock() {
         </DockItem>
         <DockItem>
           <DockIcon>
-            <LogOut />
+            <button className="cursor-pointer" onClick={() => signOut()}>
+              <LogOut />
+            </button>
+            
           </DockIcon>
           <DockLabel>Sign-out</DockLabel>
         </DockItem>

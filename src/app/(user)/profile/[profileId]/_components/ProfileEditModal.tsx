@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -17,14 +17,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { X, Plus, Upload, User, Save } from "lucide-react"
+import { X, Plus, User, Save } from "lucide-react"
+import axios from "axios"
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     section: z.string().min(1, "Section is required"),
     branch: z.string().min(2, "Branch is required"),
     year: z.string().min(1, "Year is required"),
-    college: z.string().min(2, "College is required"), // Added this
+    college: z.string().min(2, "College is required"),
     bio: z.string().max(300, "Bio must be less than 300 characters").optional(),
     image: z.string().url("Invalid image URL").optional().or(z.literal("")),
     skills: z.array(z.string().min(1)).min(1, "At least one skill is required"),
@@ -36,12 +37,13 @@ interface ProfileEditModalProps {
     isOpen: boolean
     onClose: () => void
     profile: any
-    onSave: (data: ProfileFormData) => void
+    onSave: (data: any) => void
 }
 
 export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEditModalProps) {
     const [skillInput, setSkillInput] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const submitLockRef = useRef(false)
 
     const {
         register,
@@ -53,14 +55,14 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
     } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            name: profile.name || "",
-            section: profile.section || "",
-            branch: profile.branch || "",
-            year: profile.year || "",
-            college: profile.college || "", // Added this
-            bio: profile.bio || "",
-            image: profile.image || "",
-            skills: profile.skills || [],
+            name: profile?.name || "",
+            section: profile?.section || "",
+            branch: profile?.branch || "",
+            year: profile?.year || "",
+            college: profile?.college || "",
+            bio: profile?.bio || "",
+            image: profile?.image || "",
+            skills: profile?.skills || [],
         }
     })
 
@@ -79,14 +81,41 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
     }
 
     const onSubmit = async (data: ProfileFormData) => {
+        // Prevent double submission with lock
+        if (submitLockRef.current) {
+            console.log("Submission already in progress, ignoring...")
+            return
+        }
+
+        submitLockRef.current = true
         setIsSubmitting(true)
+        
         try {
-            await onSave(data)
-            reset(data)
-        } catch (error) {
+            // Remove empty image field
+            const submitData = { ...data }
+            if (!submitData.image || submitData.image === "") {
+                delete submitData.image
+            }
+            
+            console.log("Sending data:", submitData)
+            const response = await axios.put(`/api/profile/me`, submitData)
+            console.log("Update successful:", response.data)
+            
+            onSave(response.data)
+            onClose()
+        } catch (error: any) {
             console.error("Error updating profile:", error)
+            if (Array.isArray(error.response?.data)) {
+                error.response.data.forEach((err: any) => {
+                    console.error("Validation error:", err)
+                })
+            }
         } finally {
             setIsSubmitting(false)
+            // Release lock after a delay to prevent rapid resubmission
+            setTimeout(() => {
+                submitLockRef.current = false
+            }, 1000)
         }
     }
 

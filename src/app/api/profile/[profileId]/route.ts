@@ -1,4 +1,5 @@
 import { db } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 export async function GET(
@@ -7,9 +8,8 @@ export async function GET(
 ) {
   try {
     const { profileId } = await params;
-
     const validatedProfileId = z.string().cuid("Invalid profile ID").parse(profileId);
-
+    console.log(validatedProfileId);
     // 2. Fetch the profile and its associated projects
     const profile = await db.profile.findUnique({
       where: { id: validatedProfileId }, // Use the validated ID

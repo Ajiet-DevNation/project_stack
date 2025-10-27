@@ -6,8 +6,7 @@ import { signOut } from 'next-auth/react';
 export default function Navbar() {
   return (
     <nav 
-      className="fixed bottom-7 left-0 right-0" 
-      style={{ zIndex: 50 }}
+      className="fixed bottom-7 left-0 right-0 z-[9999] pointer-events-auto"
     >
       <div className="max-w-4xl mx-auto px-6 py-4 bg-neutral-900/80 backdrop-blur-xl border-t border-white/10 shadow-2xl rounded-2xl">
         <div className="flex items-center justify-between">
@@ -31,7 +30,7 @@ export default function Navbar() {
               <span className="hidden sm:inline">Community</span>
             </a>
             <button 
-              className='hidden cursor-pointer sm:inline text-gray-300 hover:text-white transition-colors'
+              className='hidden cursor-pointer z-20 sm:inline text-gray-300 hover:text-white transition-colors'
               onClick={() => signOut()}
             >
               Sign-out

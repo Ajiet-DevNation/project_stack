@@ -1,26 +1,24 @@
-// import { getServerSession } from "next-auth"
-// import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-// import { redirect } from "next/navigation"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { redirect } from "next/navigation"
 import ProfilePageWrapper from "./[profileId]/_components/ProfilePageWrapper";
+import { db } from "@/lib/prisma";
 
 export default async function ProfilePage() {
-  // Uncomment when implementing auth
-  // const session = await getServerSession(authOptions)
-  // if (!session?.user?.id) {
-  //   redirect("/auth/signin")
-  // }
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    redirect("/")
+  }
 
-  // Get user's profile ID from session
-  // const userProfile = await db.profile.findUnique({
-  //   where: { userId: session.user.id }
-  // })
-  
-  // if (!userProfile) {
-  //   redirect("/onboarding")
-  // }
+  // Fetch the profile ID from the user ID
+  const profile = await db.profile.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true }
+  });
 
-  // For demo, use demo profile ID
-  const currentUserProfileId = "profile123"
+  if (!profile) {
+    redirect("/onboarding") // Redirect if no profile exists
+  }
 
-  return <ProfilePageWrapper profileId={currentUserProfileId} />
+  return <ProfilePageWrapper profileId={profile.id} />
 }

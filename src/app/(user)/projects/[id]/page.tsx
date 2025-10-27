@@ -60,8 +60,7 @@ async function getProject(id: string): Promise<ApiProject | null> {
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  // 2. FIX: Removed 'await' since params is not a Promise.
-  const { id } = params
+  const { id } = await params;
   const apiProject = await getProject(id)
 
   if (!apiProject) {
