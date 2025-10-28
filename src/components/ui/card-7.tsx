@@ -1,4 +1,5 @@
 import * as React from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -238,9 +239,9 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
                   "hover:bg-primary/90" // Standard hover for primary
                 )}
               >
-                <a href={href} target="_blank" rel="noopener noreferrer">
+                <Link href={href}>
                   View Project <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                </Link>
               </Button>
             </div>
           </div>

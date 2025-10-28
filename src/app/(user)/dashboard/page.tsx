@@ -6,6 +6,7 @@ const Page = () => {
   const { data: session, status } = useSession(); // session has user info      // user is not authenticated
 
   return (
+    
     <>
     <div className='h-screen bg-background '>
       <div className='  flex justify-center '>Hi {session?.user.name}</div>

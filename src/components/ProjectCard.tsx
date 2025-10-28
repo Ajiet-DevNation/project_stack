@@ -84,7 +84,7 @@ export default function ProjectCard() {
               status={project.projectStatus}
               likes={project._count.likes}
               comments={project._count.comments}
-              href={project.liveUrl || project.githubLink || "#"}
+              href={`/projects/${project.id}` || "#"}
               githubUrl={project.githubLink || undefined}
               techStack={project.requiredSkills.map((skill) => ({
                 name: skill,

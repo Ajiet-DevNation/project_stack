@@ -107,7 +107,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <div className="w-full px-4 py-4 sm:px-6 lg:px-8">
           <nav>
             {/* 3. Minor Tweak: Use <Link> for client-side navigation */}
-            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/home" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               ← Back to Projects
             </Link>
           </nav>
