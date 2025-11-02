@@ -31,14 +31,14 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
             </DialogHeader>
             <div className="space-y-4">
               <Button
-                onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+                onClick={() => signIn('google', { callbackUrl: '/home' })}
                 className="w-full flex items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm hover:bg-gray-50"
               >
                 <FaGoogle />
                 Continue with Google
               </Button>
               <Button
-                onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
+                onClick={() => signIn('github', { callbackUrl: '/home' })}
                 className="w-full flex items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm hover:bg-gray-50"
               >
                 <FaGithub />

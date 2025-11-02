@@ -81,13 +81,13 @@ model Project {
   liveUrl        String?
   thumbnail      String?
   authorId       String
-  endDate        DateTime
   githubLink     String?
   isActive       Boolean       @default(true)
   postedOn       DateTime      @default(now())
   projectStatus  String
   requiredSkills String[]
   startDate      DateTime
+  endDate        DateTime?
   applicants     Application[]
   comments       Comment[]
   contributors   Contributor[]

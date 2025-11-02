@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useForm, Controller } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
@@ -48,7 +48,6 @@ export function OnboardingForm() {
   const [completedFields, setCompletedFields] = React.useState<Set<string>>(new Set())
   
   const {
-    control,
     register,
     handleSubmit,
     setValue,
@@ -131,12 +130,12 @@ export function OnboardingForm() {
   }
 
   const nextStep = async () => {
-    const currentFields = formSteps[currentStep].fields
-    const isValid = await trigger(currentFields as any)
+    const currentFields = formSteps[currentStep].fields as (keyof FormValues)[];
+    const isValid = await trigger(currentFields);
     if (isValid && currentStep < formSteps.length - 1) {
-      setCurrentStep(currentStep + 1)
+      setCurrentStep(currentStep + 1);
     }
-  }
+  };
 
   const prevStep = () => {
     if (currentStep > 0) {
@@ -171,7 +170,7 @@ export function OnboardingForm() {
         <div className="space-y-2">
           <h3 className="text-xl font-semibold text-foreground">Welcome to ProjectStack!</h3>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Let's set up your profile in just 3 simple steps. This will help us match you with the perfect projects and collaborators.
+            Let&apos;s set up your profile in just 3 simple steps. This will help us match you with the perfect projects and collaborators.
           </p>
         </div>
 

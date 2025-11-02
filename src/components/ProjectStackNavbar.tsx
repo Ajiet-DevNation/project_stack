@@ -6,6 +6,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils"; // Import cn for managing classes
 import { signOut } from "next-auth/react";
 
+
+
 // Updated to use theme colors
 const DockLogo = () => (
   <Link href="/" className="flex items-center gap-4">
@@ -23,8 +25,11 @@ const DockLogo = () => (
     </span>
   </Link>
 );
+interface ProjectStackDockProps {
+  onOpenCreateModal: () => void;
+}
 
-export function ProjectStackDock() {
+export function ProjectStackDock({ onOpenCreateModal }: ProjectStackDockProps) {
   return (
     <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none z-20">
       <Dock
@@ -50,7 +55,9 @@ export function ProjectStackDock() {
         {/* Right Side: A group for the icons */}
         <DockItem>
           <DockIcon>
-            <Plus />
+            <button className="cursor-pointer" onClick={onOpenCreateModal}>
+              <Plus />
+            </button>
           </DockIcon>
           <DockLabel>Create</DockLabel>
         </DockItem>
@@ -71,7 +78,6 @@ export function ProjectStackDock() {
             <button className="cursor-pointer" onClick={() => signOut()}>
               <LogOut />
             </button>
-            
           </DockIcon>
           <DockLabel>Sign-out</DockLabel>
         </DockItem>
