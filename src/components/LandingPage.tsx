@@ -3,6 +3,7 @@ import { Sparkles, Users, Lightbulb, ArrowRight } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ThreeBackground from './threejs/ThreeBackground';
+import SpiralAnimation from './SpiralAnimation';
 
 interface LandingPageProps {
   onGetStarted?: () => void;
@@ -26,6 +27,7 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
   return (
     <div className="min-h-screen text-white relative">
       {/* <ThreeBackground /> */}
+      <SpiralAnimation />
       
       {/* Overlay gradient for better text readability */}
       <div className="fixed inset-0 bg-gradient-to-b from-neutral-900/60 via-neutral-900/40 to-neutral-900/60 pointer-events-none" style={{ zIndex: 1 }}></div>
