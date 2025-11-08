@@ -13,6 +13,7 @@ import {
   Calendar,
   Eye
 } from "lucide-react"
+import Link from "next/link"
 
 interface Project {
   id: string
@@ -127,10 +128,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 pt-2">
-          <Button size="sm" className="flex-1 bg-primary/80 hover:bg-primary/90">
-            <Eye className="w-3 h-3 mr-1" />
-            View
-          </Button>
+          <Link href={`projects/${project.id}`}>
+            <Button size="sm" className="flex-1 bg-primary/80 hover:bg-primary/90">
+              <Eye className="w-3 h-3 mr-1" />
+              View
+            </Button>
+          </Link>
+          
           {project.liveUrl && (
             <Button size="sm" variant="outline" className="bg-background/20 border-border/20">
               <ExternalLink className="w-3 h-3" />
