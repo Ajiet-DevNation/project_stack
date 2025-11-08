@@ -22,6 +22,9 @@ import {
 import { ProjectCard } from "./ProjectCard";
 import { ProfileEditModal } from "./ProfileEditModal";
 import axios from "axios";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { useSession } from "next-auth/react";
 
 interface ProfileContentProps {
   profileId?: string; // Make optional
@@ -58,6 +61,7 @@ interface Profile {
   bio?: string;
   skills: string[];
   projects: Project[];
+  userId: string;
 }
 
 function ProfileContent({ profileId }: ProfileContentProps) {
@@ -66,20 +70,22 @@ function ProfileContent({ profileId }: ProfileContentProps) {
   const [activeTab, setActiveTab] = useState("projects");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { data: session, status } = useSession();
+  let isOwnProfile = false;
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
         setError(null);
-        
         // If no profileId provided, fetch current user's profile
         const endpoint = profileId ? `/api/profile/${profileId}` : `/api/profile/me`;
         console.log("Fetching from:", endpoint);
-        
+
         const { data } = await axios.get(endpoint);
         console.log("Profile data received:", data);
         setProfile(data);
+
       } catch (error: any) {
         console.error("Error fetching Profile", error);
         const errorMessage = error.response?.data || error.message || "Failed to load profile";
@@ -88,9 +94,12 @@ function ProfileContent({ profileId }: ProfileContentProps) {
         setLoading(false);
       }
     };
-    
+
     fetchProfile();
   }, [profileId]);
+
+  console.log("Ajji Shunti myan", session?.user);
+  if (session?.user.id == profile?.userId) isOwnProfile = true;
 
   const handleProfileUpdate = async (updatedData: any) => {
     try {
@@ -145,7 +154,6 @@ function ProfileContent({ profileId }: ProfileContentProps) {
     { label: "Comments", value: 28, icon: MessageCircle },
   ];
 
-  const isOwnProfile = true;
 
   return (
     <main className="relative z-0 min-h-screen">
@@ -194,7 +202,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                             <span>{profile.branch}</span>
                           </div>
                         )}
-                                                {profile.year && (
+                        {profile.year && (
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             <span>{profile.year}</span>
@@ -348,14 +356,14 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ delay: index * 0.1 }}
                       >
-                        <ProjectCard 
-                          project={{ 
-                            ...project, 
+                        <ProjectCard
+                          project={{
+                            ...project,
                             requiredSkills: project.requiredSkills || [],
                             likes: project._count?.likes || 0,
                             comments: project._count?.comments || 0,
                             contributors: project._count?.contributors || 0
-                          }} 
+                          }}
                         />
                       </motion.div>
                     ))}
@@ -379,7 +387,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
             <TabsContent value="contributions" className="space-y-6">
               <motion.div
                 initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
                 className="text-center py-12"
               >
                 <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />

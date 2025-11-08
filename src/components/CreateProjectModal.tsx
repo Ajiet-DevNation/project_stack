@@ -309,9 +309,8 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
                 )}
               >
                 <option value="Planning">Planning</option>
-                <option value="In Progress">In Progress</option>
+                <option value="Active">Active</option>
                 <option value="Completed">Completed</option>
-                <option value="On Hold">On Hold</option>
               </select>
               {errors.projectStatus && (
                 <p className="text-xs sm:text-sm text-destructive animate-in slide-in-from-top-1 duration-200">
