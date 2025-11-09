@@ -188,7 +188,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <Link href={`/profile/${project.creator.id}`} className="flex items-center gap-4 group">
               {project.creator.avatar ? (
                 <Image
-                  src={project.creator.avatar}
+                  src={`${project.creator.avatar}`}
                   alt={project.creator.name}
                   width={48}
                   height={48}

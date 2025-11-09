@@ -63,6 +63,14 @@ export function ProjectStackDock({ onOpenCreateModal }: ProjectStackDockProps) {
         </DockItem>
         <DockItem>
           <DockIcon>
+            <Link href={"/home"} className="cursor-pointer">
+              <Home />
+            </Link>
+          </DockIcon>
+          <DockLabel>Home</DockLabel>
+        </DockItem>
+        <DockItem>
+          <DockIcon>
             <Search />
           </DockIcon>
           <DockLabel>Search</DockLabel>
