@@ -68,6 +68,7 @@ model Profile {
   userId        String        @unique
   applications  Application[]
   comments      Comment[]
+  notifications Notification[]
   contributions Contributor[]
   likes         Like[]
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -93,6 +94,20 @@ model Project {
   contributors   Contributor[]
   likes          Like[]
   author         Profile       @relation("ProjectAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  recipientId String
+  message     String
+  type        String
+  projectId   String?
+  applicationId String?
+  createdAt   DateTime @default(now())
+  
+  recipient   Profile  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  
+  @@index([recipientId])
 }
 
 model Comment {
