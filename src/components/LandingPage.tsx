@@ -86,7 +86,7 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
                 onClick={
                   !session?.user
                     ? onGetStarted
-                    : () => router.push('/dashboard')
+                    : () => router.push('/home')
                 }
                 className="group px-8 py-4 rounded-full font-semibold text-neutral-900 transition-all duration-300 flex items-center gap-2 shadow-lg hover:scale-105 cursor-pointer"
                 style={{

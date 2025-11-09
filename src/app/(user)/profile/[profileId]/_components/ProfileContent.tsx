@@ -25,9 +25,10 @@ import axios from "axios";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { useSession } from "next-auth/react";
+import { getUserContributions } from "../../../../../../actions/applications";
 
 interface ProfileContentProps {
-  profileId?: string; // Make optional
+  profileId?: string;
 }
 
 interface Project {
@@ -71,6 +72,8 @@ function ProfileContent({ profileId }: ProfileContentProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { data: session, status } = useSession();
+  const [contributions, setContributions] = useState<any[]>([]);
+
   let isOwnProfile = false;
 
   useEffect(() => {
@@ -86,6 +89,12 @@ function ProfileContent({ profileId }: ProfileContentProps) {
         console.log("Profile data received:", data);
         setProfile(data);
 
+        if (data.id) {
+          const contributionsResult = await getUserContributions(data.id);
+          if (contributionsResult.success) {
+            setContributions(contributionsResult.data || []);
+          }
+        }
       } catch (error: any) {
         console.error("Error fetching Profile", error);
         const errorMessage = error.response?.data || error.message || "Failed to load profile";
@@ -149,7 +158,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
 
   const stats = [
     { label: "Projects", value: profile.projects?.length || 0, icon: Code },
-    { label: "Contributions", value: 12, icon: Users },
+    { label: "Contributions", value: contributions.length, icon: Users },
     { label: "Likes Received", value: 42, icon: Heart },
     { label: "Comments", value: 28, icon: MessageCircle },
   ];
@@ -385,17 +394,53 @@ function ProfileContent({ profileId }: ProfileContentProps) {
             </TabsContent>
 
             <TabsContent value="contributions" className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-12"
-              >
-                <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium text-foreground mb-2">No contributions yet</h3>
-                <p className="text-muted-foreground">
-                  Contributions will appear here once you start collaborating on projects.
-                </p>
-              </motion.div>
+              {contributions.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <AnimatePresence>
+                    {contributions.map((contribution: any, index: number) => (
+                      <motion.div
+                        key={contribution.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <ProjectCard
+                          project={{
+                            id: contribution.project.id,
+                            title: contribution.project.title,
+                            description: contribution.project.description,
+                            liveUrl: contribution.project.liveUrl,
+                            thumbnail: contribution.project.thumbnail,
+                            endDate: contribution.project.endDate,
+                            githubLink: contribution.project.githubLink,
+                            isActive: contribution.project.isActive,
+                            postedOn: contribution.project.postedOn,
+                            projectStatus: contribution.project.projectStatus,
+                            requiredSkills: contribution.project.requiredSkills || [],
+                            startDate: contribution.project.startDate,
+                            likes: contribution.project._count?.likes || 0,
+                            comments: contribution.project._count?.comments || 0,
+                            contributors: contribution.project._count?.contributors || 0
+                          }}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-12"
+                >
+                  <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No contributions yet</h3>
+                  <p className="text-muted-foreground">
+                    Contributions will appear here once you start collaborating on projects.
+                  </p>
+                </motion.div>
+              )}
             </TabsContent>
 
             <TabsContent value="activity" className="space-y-6">
