@@ -162,7 +162,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
     { label: "Likes Received", value: 42, icon: Heart },
     { label: "Comments", value: 28, icon: MessageCircle },
   ];
-
+  console.log(profile.image);
 
   return (
     <main className="relative z-0 min-h-screen">

@@ -9,6 +9,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/prisma';
 import { ApplyButton } from "../_components/ApplyButton"
+import { DeleteProjectButton } from "../_components/DeleteButton"
 
 interface ProjectPageProps {
   params: { id: string }
@@ -158,14 +159,22 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex flex-col w-full sm:flex-row sm:items-start sm:justify-between gap-4">
               <div>
-                <h1 className="text-4xl font-serif text-foreground mb-3">
+                <h1 className="text-4xl w-full font-serif text-foreground mb-3">
                   {project.title}
                 </h1>
-                <p className="text-lg font-serif text-muted-foreground">
-                  {project.description}
-                </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <p className="text-lg font-serif text-muted-foreground flex-1">
+                    {project.description}
+                  </p>
+
+                  {isProjectOwner && (
+                    <div className="flex justify-between">
+                      <DeleteProjectButton projectId={id} projectTitle={project.title}/>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {isProjectOwner && (
@@ -181,14 +190,16 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   Manage
                 </Link>
               )}
+
             </div>
+
           </section>
 
           <section className="mb-12 flex flex-wrap items-center justify-between gap-6 fade-in-up delay-200">
             <Link href={`/profile/${project.creator.id}`} className="flex items-center gap-4 group">
               {project.creator.avatar ? (
                 <Image
-                  src={project.creator.avatar}
+                  src={`${project.creator.avatar}`}
                   alt={project.creator.name}
                   width={48}
                   height={48}

@@ -2,6 +2,7 @@ import { db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { z } from "zod";
+import { NextResponse } from "next/server";
 
 // Zod schema to validate the incoming profile data
 export const profileSchema = z.object({
@@ -60,5 +61,38 @@ export async function POST(req: Request) {
     }
     console.error("POST /api/profile error:", error);
     return new Response("Internal Server Error", { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const profile = await db.profile.findFirst({
+      where: {
+        user: {
+          email: session.user.email,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ profileId: profile.id });
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch profile" },
+      { status: 500 }
+    );
   }
 }

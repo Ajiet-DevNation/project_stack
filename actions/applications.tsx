@@ -1,11 +1,10 @@
-// lib/actions/application.actions.ts
 'use server';
 
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import { createNotification } from './notifications';
 
 const prisma = new PrismaClient();
-
 
 export async function applyToProject(profileId: string, projectId: string) {
     try {
@@ -49,8 +48,21 @@ export async function applyToProject(profileId: string, projectId: string) {
             },
             include: {
                 applicant: true,
-                project: true,
+                project: {
+                    include: {
+                        author: true,
+                    },
+                },
             },
+        });
+
+        // Create notification for project owner
+        await createNotification({
+            recipientId: application.project.authorId,
+            message: `${application.applicant.name} applied to your project "${application.project.title}"`,
+            type: 'APPLICATION_SUBMITTED',
+            projectId,
+            applicationId: application.id,
         });
 
         revalidatePath(`/projects/${projectId}`);
@@ -76,6 +88,7 @@ export async function acceptApplication(applicationId: string, authorId: string)
             where: { id: applicationId },
             include: {
                 project: true,
+                applicant: true,
             },
         });
 
@@ -116,6 +129,15 @@ export async function acceptApplication(applicationId: string, authorId: string)
             return { updatedApplication, contributor };
         });
 
+        // Create notification for applicant
+        await createNotification({
+            recipientId: application.profileId,
+            message: `Your application to "${application.project.title}" was accepted! 🎉`,
+            type: 'APPLICATION_ACCEPTED',
+            projectId: application.projectId,
+            applicationId: application.id,
+        });
+
         revalidatePath(`/projects/${application.projectId}`);
         revalidatePath(`/projects/${application.projectId}/applications`);
 
@@ -139,6 +161,7 @@ export async function rejectApplication(applicationId: string, authorId: string)
             where: { id: applicationId },
             include: {
                 project: true,
+                applicant: true,
             },
         });
 
@@ -166,6 +189,15 @@ export async function rejectApplication(applicationId: string, authorId: string)
         const updatedApplication = await prisma.application.update({
             where: { id: applicationId },
             data: { status: 'Rejected' },
+        });
+
+        // Create notification for applicant
+        await createNotification({
+            recipientId: application.profileId,
+            message: `Your application to "${application.project.title}" was not accepted`,
+            type: 'APPLICATION_REJECTED',
+            projectId: application.projectId,
+            applicationId: application.id,
         });
 
         revalidatePath(`/projects/${application.projectId}/applications`);
@@ -312,7 +344,6 @@ export async function getUserContributions(profileId: string) {
         };
     }
 }
-
 
 export async function removeContributor(contributorId: string, authorId: string) {
     try {

@@ -1,8 +1,16 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
-    domains: ["undraw.co"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**", // allows all HTTPS image sources
+      },
+      {
+        protocol: "http",
+        hostname: "**", // optional: allows all HTTP sources too
+      },
+    ],
   },
 };
 
