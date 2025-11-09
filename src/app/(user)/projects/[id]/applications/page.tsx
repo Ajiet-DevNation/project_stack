@@ -1,6 +1,3 @@
-
-
-// app/(user)/projects/[id]/applications/page.tsx - UPDATE
 import DemoOne from "@/components/ShaderBackground";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -16,32 +13,18 @@ interface ApplicationsPageProps {
 }
 
 export default async function ApplicationsPage({ params }: ApplicationsPageProps) {
-    const { id } = await params;
+    const { id } = params;
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.email) {
-        redirect("/login");
-    }
+    if (!session?.user?.email) redirect("/login");
 
     const userProfile = await db.profile.findFirst({
-        where: {
-            user: {
-                email: session.user.email,
-            },
-        },
+        where: { user: { email: session.user.email } },
     });
+    if (!userProfile) redirect("/onboarding");
 
-    if (!userProfile) {
-        redirect("/onboarding");
-    }
-
-    const project = await db.project.findUnique({
-        where: { id },
-    });
-
-    if (!project || project.authorId !== userProfile.id) {
-        redirect(`/projects/${id}`);
-    }
+    const project = await db.project.findUnique({ where: { id } });
+    if (!project || project.authorId !== userProfile.id) redirect(`/projects/${id}`);
 
     const applicationsResult = await getProjectApplications(id, userProfile.id);
     const applications = applicationsResult.success ? applicationsResult.data || [] : [];
@@ -58,7 +41,7 @@ export default async function ApplicationsPage({ params }: ApplicationsPageProps
 
             <main className="relative z-0 min-h-screen pb-20">
                 <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-10">
-                    <div className="w-full px-4 py-4 sm:px-6 lg:px-8">
+                    <div className="w-full px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
                         <Link
                             href={`/projects/${id}`}
                             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -71,9 +54,7 @@ export default async function ApplicationsPage({ params }: ApplicationsPageProps
                 <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
                     <div className="mb-8">
                         <h1 className="text-4xl font-serif text-foreground mb-2">Applications</h1>
-                        <p className="text-lg text-muted-foreground">
-                            Manage applications for your project
-                        </p>
+                        <p className="text-lg text-muted-foreground">Manage applications for your project</p>
                     </div>
 
                     <Tabs defaultValue="all" className="space-y-6">
@@ -114,9 +95,3 @@ export default async function ApplicationsPage({ params }: ApplicationsPageProps
         </>
     );
 }
-
-// ProfileContent.tsx - FIX for contributions setState
-// Change this line in ProfileContent.tsx:
-// FROM:
-// setContributions(contributionsResult.data);
-// TO:

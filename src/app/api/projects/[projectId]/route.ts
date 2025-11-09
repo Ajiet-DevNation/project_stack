@@ -3,9 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { z } from "zod";
 import { projectSchema } from "../route";
-import { NextResponse } from "next/server";
-
+import { NextRequest, NextResponse } from "next/server";
 const updateProjectSchema = projectSchema.partial();
+import { createNotification } from "../../../../../actions/notifications";
 
 export async function GET(
   req: Request,
@@ -61,7 +61,7 @@ export async function PATCH(
     const session = await getServerSession(authOptions);
     if (!session?.user?.id)
       return new Response("Unauthorized", { status: 401 });
-    
+
     const { projectId } = await params;
     const validatedProjectId = z.string().cuid().parse(projectId);
 
@@ -88,31 +88,93 @@ export async function PATCH(
   }
 }
 
+// app/api/projects/[id]/route.ts
+
+
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { projectId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id)
-      return new Response("Unauthorized", { status: 401 });
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userProfile = await db.profile.findFirst({
+      where: {
+        user: {
+          email: session.user.email,
+        },
+      },
+    });
+
+    if (!userProfile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
 
     const { projectId } = await params;
-    const validatedProjectId = z.string().cuid().parse(projectId);
 
-    const userProfile = await db.profile.findUnique({
-      where: { userId: session.user.id },
+    // Get project with applicants and contributors
+    const project = await db.project.findUnique({
+      where: { id: projectId },
+      include: {
+        applicants: {
+          include: {
+            applicant: true,
+          },
+        },
+        contributors: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
-    const project = await db.project.findFirst({
-      where: { id: validatedProjectId, authorId: userProfile?.id },
+
+    if (!project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    if (project.authorId !== userProfile.id) {
+      return NextResponse.json(
+        { error: "Only project author can delete this project" },
+        { status: 403 }
+      );
+    }
+
+    // Get unique profile IDs (applicants and contributors)
+    const applicantIds = project.applicants.map((a) => a.profileId);
+    const contributorIds = project.contributors.map((c) => c.profileId);
+    const allAffectedUserIds = [...new Set([...applicantIds, ...contributorIds])];
+
+    // Create notifications for all affected users
+    const notificationPromises = allAffectedUserIds.map((profileId) =>
+      createNotification({
+        recipientId: profileId,
+        message: `The project "${project.title}" has been deleted by its owner`,
+        type: "PROJECT_DELETED",
+        projectId: undefined,
+      })
+    );
+
+    await Promise.all(notificationPromises);
+
+    // Delete the project (cascade will handle related records)
+    await db.project.delete({
+      where: { id: projectId },
     });
 
-    if (!project) return new Response("Forbidden", { status: 403 });
-
-    await db.project.delete({ where: { id: validatedProjectId } });
-    return new Response(null, { status: 204 });
+    return NextResponse.json(
+      { message: "Project deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
-    const err = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ err }, { status: 500 });
+    console.error("Error deleting project:", error);
+    return NextResponse.json(
+      { error: "Failed to delete project" },
+      { status: 500 }
+    );
   }
 }
