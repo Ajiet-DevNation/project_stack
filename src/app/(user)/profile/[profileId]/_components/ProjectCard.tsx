@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-interface Project {
+export interface Project {
   id: string
   title: string
   description: string
@@ -24,11 +24,20 @@ interface Project {
   githubLink?: string
   requiredSkills: string[]
   projectStatus: string
+  startDate?: string
+  endDate?: string
   postedOn: string
+  isActive?: boolean
   likes: number
   comments: number
   contributors: number
+  _count?: {
+    likes: number
+    comments: number
+    contributors: number
+  }
 }
+
 
 interface ProjectCardProps {
   project: Project
