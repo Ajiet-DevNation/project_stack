@@ -4,6 +4,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ThreeBackground from './threejs/ThreeBackground';
 import SpiralAnimation from './SpiralAnimation';
+import FAQSection from './FAQSection';
 
 interface LandingPageProps {
   onGetStarted?: () => void;
@@ -33,7 +34,7 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
       <div className="fixed inset-0 bg-gradient-to-b from-neutral-900/60 via-neutral-900/40 to-neutral-900/60 pointer-events-none" style={{ zIndex: 1 }}></div>
 
       {/* Main Content */}
-      <div className="relative flex flex-col min-h-screen pb-24 pointer-events-none" style={{ zIndex: 2 }}>
+      <div className="relative flex flex-col min-h-screen pb-24 pt-30 pointer-events-none" style={{ zIndex: 2 }}>
         
         {/* Hero Section */}
         <section className="flex-1 flex items-center justify-center px-4 py-20">
@@ -119,6 +120,10 @@ export default function LandingPage({ onGetStarted, onExploreProjects }: Landing
           </div>
         </section>
 
+      {/* FAQ Section - Add this */}
+        <div className="pointer-events-auto ">
+          <FAQSection />
+        </div>
       </div>
     </div>
   );
