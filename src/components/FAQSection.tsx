@@ -40,23 +40,20 @@ const FAQSection: React.FC = () => {
   };
 
   return (
-    <section className="py-20 px-4 pt-38 relative">
+    <section className="py-20 px-4 pt-38 relative ">
       {/* Background gradient */}
-      <div className="absolute inset-0  from-neutral-900 via-neutral-800 to-neutral-900 opacity-50"></div>
+      <div className="absolute inset-0  from-background via-muted to-background opacity-50"></div>
       
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-12 space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-white">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground">
             Frequently Asked{' '}
-            <span 
-              className="text-transparent bg-clip-text"
-              style={{backgroundImage: 'linear-gradient(to right, #A7727D, #EDDBC7, #F8EAD8)'}}
-            >
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
               Questions
             </span>
           </h2>
-          <p className="text-gray-400 text-lg">
+          <p className="text-muted-foreground text-lg">
             Everything you need to know about participating
           </p>
         </div>
@@ -66,12 +63,11 @@ const FAQSection: React.FC = () => {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="backdrop-blur-md border border-white/10 rounded-lg overflow-hidden transition-all duration-300 hover:border-white/20"
-              style={{
-                background: openIndex === index 
-                  ? 'linear-gradient(to right, rgba(167, 114, 125, 0.1), rgba(237, 219, 199, 0.05))' 
-                  : 'rgba(255, 255, 255, 0.05)'
-              }}
+              className={`backdrop-blur-md border rounded-lg overflow-hidden transition-all duration-300 hover:border-primary/30 ${
+                openIndex === index 
+                  ? 'bg-primary/5 border-primary/20' 
+                  : 'bg-card/50 border-border'
+              }`}
             >
               {/* Question */}
               <button
@@ -79,20 +75,16 @@ const FAQSection: React.FC = () => {
                 className="w-full px-6 py-5 flex items-center justify-between text-left transition-all duration-300 group"
               >
                 <span 
-                  className="text-lg font-semibold transition-colors duration-300"
-                  style={{
-                    color: openIndex === index ? '#EDDBC7' : '#ffffff'
-                  }}
+                  className={`text-lg font-semibold transition-colors duration-300 ${
+                    openIndex === index ? 'text-secondary-foreground' : 'text-foreground'
+                  }`}
                 >
                   {faq.question}
                 </span>
                 <ChevronDown
                   className={`w-5 h-5 transition-all duration-300 ${
-                    openIndex === index ? 'rotate-180' : ''
+                    openIndex === index ? 'rotate-180 text-secondary-foreground' : 'text-muted-foreground'
                   }`}
-                  style={{
-                    color: openIndex === index ? '#EDDBC7' : '#9ca3af'
-                  }}
                 />
               </button>
 
@@ -102,13 +94,8 @@ const FAQSection: React.FC = () => {
                   openIndex === index ? 'max-h-96' : 'max-h-0'
                 }`}
               >
-                <div 
-                  className="px-6 pb-5 pt-2 border-t"
-                  style={{
-                    borderColor: 'rgba(237, 219, 199, 0.2)'
-                  }}
-                >
-                  <p className="text-gray-300 leading-relaxed">
+                <div className="px-6 pb-5 pt-2 border-t border-primary/20">
+                  <p className="text-muted-foreground leading-relaxed">
                     {faq.answer}
                   </p>
                 </div>
@@ -116,12 +103,7 @@ const FAQSection: React.FC = () => {
 
               {/* Accent line */}
               {openIndex === index && (
-                <div 
-                  className="h-1 animate-pulse"
-                  style={{
-                    background: 'linear-gradient(to right, #A7727D, #EDDBC7)'
-                  }}
-                ></div>
+                <div className="h-1 animate-pulse bg-gradient-to-r from-primary to-secondary"></div>
               )}
             </div>
           ))}
@@ -129,17 +111,10 @@ const FAQSection: React.FC = () => {
 
         {/* Call to action */}
         <div className="mt-12 text-center">
-          <p className="text-gray-400 mb-4">
+          <p className="text-muted-foreground mb-4">
             Still have questions?
           </p>
-          <button 
-            className="px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105"
-            style={{
-              background: 'linear-gradient(to right, #A7727D, #EDDBC7)',
-              color: '#1a1a1a',
-              boxShadow: '0 10px 40px rgba(167, 114, 125, 0.3)'
-            }}
-          >
+          <button className="px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 bg-secondary text-secondary-foreground shadow-lg shadow-secondary/30">
             Contact Us
           </button>
         </div>
