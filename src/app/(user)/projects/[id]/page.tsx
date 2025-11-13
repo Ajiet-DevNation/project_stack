@@ -1,76 +1,85 @@
-// app/(user)/projects/[id]/page.tsx
-import DemoOne from "@/components/ShaderBackground"
-import { ExternalLink, Github, Heart, MessageCircle } from "lucide-react"
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import Image from "next/image"
-import { checkApplicationStatus } from '../../../../../actions/applications';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { db } from '@/lib/prisma';
-import { ApplyButton } from "../_components/ApplyButton"
-import { DeleteProjectButton } from "../_components/DeleteButton"
+import DemoOne from "@/components/ShaderBackground";
+import { ExternalLink, Github, MessageCircle } from "lucide-react";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { checkApplicationStatus } from "../../../../../actions/applications";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { db } from "@/lib/prisma";
+import { ApplyButton } from "../_components/ApplyButton";
+import { DeleteProjectButton } from "../_components/DeleteButton";
+import LikeButton from "@/components/LikeButton";
 
 interface ProjectPageProps {
-  params: { id: string }
+  params: { id: string };
 }
 
+type LikeWithProfile = {
+  profileId: string;
+};
+
 interface ApiProject {
-  id: string
-  title: string
-  description: string
-  requiredSkills: string[]
-  startDate: string
-  endDate: string
-  postedOn: string
-  githubLink: string | null
-  liveUrl: string | null
-  thumbnail: string | null
-  projectStatus: 'Planning' | 'Active' | 'Completed'
-  isActive: boolean
-  authorId: string
+  id: string;
+  title: string;
+  description: string;
+  requiredSkills: string[];
+  startDate: string;
+  endDate: string;
+  postedOn: string;
+  githubLink: string | null;
+  liveUrl: string | null;
+  thumbnail: string | null;
+  projectStatus: "Planning" | "Active" | "Completed";
+  isActive: boolean;
+  authorId: string;
   author: {
-    id: string
-    name: string
-    image: string | null
-  }
-  likes: unknown[]
-  comments: unknown[]
+    id: string;
+    name: string;
+    image: string | null;
+  };
+  likes: LikeWithProfile[];
+  comments: unknown[];
   contributors: {
-    id: string
+    id: string;
     user: {
-      id: string
-      name: string
-      image: string | null
-    }
-  }[]
-  screenshots?: string[]
-  videoUrl?: string | null
+      id: string;
+      name: string;
+      image: string | null;
+    };
+  }[];
+  screenshots?: string[];
+  videoUrl?: string | null;
 }
 
 async function getProject(id: string): Promise<ApiProject | null> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/projects/${id}`, {
-      cache: 'no-store'
-    })
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/projects/${id}`,
+      {
+        cache: "no-store",
+      }
+    );
 
     if (!response.ok) {
-      return null
+      return null;
     }
-    return response.json()
+    return response.json();
   } catch (error) {
-    console.error('Failed to fetch project:', error)
-    return null
+    console.error("Failed to fetch project:", error);
+    return null;
   }
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { id } = await params;
-  const apiProject = await getProject(id)
+  const apiProject = await getProject(id);
   console.log("isActive:", apiProject?.isActive);
 
   if (!apiProject) {
-    notFound()
+    notFound();
   }
 
   const session = await getServerSession(authOptions);
@@ -88,7 +97,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
     // Check application status
     if (currentUserProfile) {
-      const statusResult = await checkApplicationStatus(currentUserProfile.id, id);
+      const statusResult = await checkApplicationStatus(
+        currentUserProfile.id,
+        id
+      );
       if (statusResult.success) {
         applicationStatus = statusResult.data;
       }
@@ -114,17 +126,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     comments: apiProject.comments.length,
     screenshots: apiProject.screenshots || [],
     isActive: apiProject.isActive,
-    contributors: apiProject.contributors.map(c => ({
+    contributors: apiProject.contributors.map((c) => ({
       id: c.user.id,
       name: c.user.name,
       avatar: c.user.image || undefined,
     })),
-  }
+  };
 
   const isProjectOwner = currentUserProfile?.id === apiProject.authorId;
   console.log("Current User Profile:", currentUserProfile);
   console.log("Is Project Owner:", isProjectOwner);
   console.log("Application Status:", applicationStatus);
+
+  const isInitiallyLiked =
+    !!currentUserProfile &&
+    apiProject.likes.some((like) => like.profileId === currentUserProfile.id);
 
   return (
     <>
@@ -136,7 +152,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-10">
           <div className="w-full px-4 py-4 sm:px-6 lg:px-8">
             <nav>
-              <Link href="/home" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link
+                href="/home"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
                 ← Back to Projects
               </Link>
             </nav>
@@ -144,16 +163,16 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </header>
 
         <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 bg-card/80 backdrop-blur-lg border border-border rounded-xl my-8 shadow-xl fade-in-up">
-
           <section className="mb-12 fade-in-up delay-100">
             <div className="flex items-center gap-3 mb-4">
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${project.status === "Completed"
-                  ? "bg-green-500/20 text-green-600 dark:text-green-400"
-                  : project.status === "Active"
+                className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  project.status === "Completed"
+                    ? "bg-green-500/20 text-green-600 dark:text-green-400"
+                    : project.status === "Active"
                     ? "bg-blue-500/20 text-blue-600 dark:text-blue-400"
                     : "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
-                  }`}
+                }`}
               >
                 {project.status}
               </span>
@@ -171,7 +190,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
                   {isProjectOwner && (
                     <div className="flex justify-between">
-                      <DeleteProjectButton projectId={id} projectTitle={project.title}/>
+                      <DeleteProjectButton
+                        projectId={id}
+                        projectTitle={project.title}
+                      />
                     </div>
                   )}
                 </div>
@@ -190,13 +212,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   Manage
                 </Link>
               )}
-
             </div>
-
           </section>
 
           <section className="mb-12 flex flex-wrap items-center justify-between gap-6 fade-in-up delay-200">
-            <Link href={`/profile/${project.creator.id}`} className="flex items-center gap-4 group">
+            <Link
+              href={`/profile/${project.creator.id}`}
+              className="flex items-center gap-4 group"
+            >
               {project.creator.avatar ? (
                 <Image
                   src={`${project.creator.avatar}`}
@@ -211,26 +234,30 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </div>
               )}
               <div>
-                <p className="text-sm font-medium text-foreground group-hover:underline">{project.creator.name}</p>
+                <p className="text-sm font-medium text-foreground group-hover:underline">
+                  {project.creator.name}
+                </p>
                 <p className="text-xs text-muted-foreground">Creator</p>
               </div>
             </Link>
 
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Heart className="h-4 w-4" />
-                <span className="text-sm font-medium">{project.likes}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MessageCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">{project.comments}</span>
+                <LikeButton
+                  projectId={project.id}
+                  isInitiallyLiked={isInitiallyLiked}
+                  initialLikeCount={project.likes}
+                  disabled={!currentUserProfile}
+                />
               </div>
             </div>
           </section>
 
           {project.contributors.length > 0 && (
             <section className="mb-12 fade-in-up delay-300">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">Contributors</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">
+                Contributors
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {project.contributors.map((contributor) => (
                   <Link
@@ -252,8 +279,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       </div>
                     )}
                     <div>
-                      <p className="text-sm font-medium text-foreground">{contributor.name}</p>
-                      <p className="text-xs text-muted-foreground">Contributor</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {contributor.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Contributor
+                      </p>
                     </div>
                   </Link>
                 ))}
@@ -289,7 +320,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               {project.screenshots.length > 1 && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                   {project.screenshots.slice(1).map((screenshot, index) => (
-                    <div key={index} className="overflow-hidden rounded-lg border border-border bg-card shadow-md hover-lift">
+                    <div
+                      key={index}
+                      className="overflow-hidden rounded-lg border border-border bg-card shadow-md hover-lift"
+                    >
                       <Image
                         src={screenshot}
                         alt={`${project.title} screenshot ${index + 2}`}
@@ -305,13 +339,17 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           )}
 
           <section className="mb-12 fade-in-up delay-600">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">About this project</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
+              About this project
+            </h2>
             <div className="prose prose-sm max-w-none text-muted-foreground">
               <p className="leading-relaxed">{project.about}</p>
             </div>
           </section>
 
-          {(project.liveUrl || project.githubUrl || (project.isActive && currentUserProfile && !isProjectOwner)) && (
+          {(project.liveUrl ||
+            project.githubUrl ||
+            (project.isActive && currentUserProfile && !isProjectOwner)) && (
             <section className="flex flex-wrap gap-3 fade-in-up delay-700">
               {project.isActive && currentUserProfile && !isProjectOwner && (
                 <ApplyButton
@@ -349,5 +387,5 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
       </main>
     </>
-  )
+  );
 }

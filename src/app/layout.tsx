@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/providers/authProvider";
 import { ThemeProvider } from "./theme-providers";
 import { ClientLayoutShell } from "@/components/ClientLayoutShell";
+import { ToastProvider } from "@/components/ui/toast-1";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -36,7 +37,9 @@ export default function RootLayout({
           
         >
           <AuthProvider>
-            <ClientLayoutShell>{children}</ClientLayoutShell>
+            <ToastProvider>
+              <ClientLayoutShell>{children}</ClientLayoutShell>
+            </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
