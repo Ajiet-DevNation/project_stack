@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useToast } from '@/components/ui/toast-1';
-import { clsx } from 'clsx'; // Using clsx (or 'cn') for Tailwind classes
+import { clsx } from 'clsx'; 
 
 interface LikeButtonProps {
   projectId: string;
   isInitiallyLiked: boolean;
-  initialLikeCount: number; // <-- We now take the starting count
+  initialLikeCount: number; 
   disabled?: boolean;
 }
 

@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 import { InboxPopup } from "./InboxPopup";
 import { getNotificationCount } from "../../actions/notifications";
+import { ActionSearchBar } from "@/components/ui/action-search-bar";
+import { AnimatePresence, motion } from "framer-motion";
 
 const DockLogo = () => (
   <Link href="/" className="flex items-center gap-4">
@@ -54,6 +56,12 @@ export function ProjectStackDock({
     return () => clearInterval(interval);
   }, [profileId]);
 
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  const toggleSearch = () => {
+    setIsSearchVisible((prev) => !prev);
+  };
+
   return (
     <>
       <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none z-20">
@@ -95,7 +103,9 @@ export function ProjectStackDock({
 
           <DockItem>
             <DockIcon>
-              <Search />
+              <button className="cursor-pointer" onClick={toggleSearch}>
+                <Search />
+              </button>
             </DockIcon>
             <DockLabel>Search</DockLabel>
           </DockItem>
@@ -129,11 +139,31 @@ export function ProjectStackDock({
       </div>
 
       {showInbox && profileId && (
-        <InboxPopup
-          profileId={profileId}
-          onClose={() => setShowInbox(false)}
-        />
+        <InboxPopup profileId={profileId} onClose={() => setShowInbox(false)} />
       )}
+
+      <AnimatePresence>
+        {isSearchVisible && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={toggleSearch}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 50 }}
+              transition={{ duration: 0.3 }}
+              className="w-full max-w-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ActionSearchBar autoFocus={isSearchVisible} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
