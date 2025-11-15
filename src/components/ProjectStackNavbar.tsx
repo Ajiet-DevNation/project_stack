@@ -159,7 +159,7 @@ export function ProjectStackDock({
               className="w-full max-w-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <ActionSearchBar autoFocus={isSearchVisible} />
+              <ActionSearchBar autoFocus={isSearchVisible} onClose={toggleSearch}/>
             </motion.div>
           </motion.div>
         )}

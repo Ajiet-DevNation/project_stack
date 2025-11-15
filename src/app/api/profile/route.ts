@@ -64,7 +64,50 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const searchQuery = searchParams.get("search");
+
+  if (searchQuery) {
+    try {
+      const profiles = await db.profile.findMany({
+        where: {
+          OR: [
+            {
+              name: {
+                contains: searchQuery,
+                mode: "insensitive",
+              },
+            },
+            {
+              skills: {
+                has: searchQuery,
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          name: true,
+          skills: true,
+          bio: true,
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+      return NextResponse.json(profiles);
+    } catch (error) {
+      console.error("Error searching profiles:", error);
+      return NextResponse.json(
+        { error: "Failed to search profiles" },
+        { status: 500 }
+      );
+    }
+  }
+
   try {
     const session = await getServerSession(authOptions);
 

@@ -1,4 +1,8 @@
+// src/components/ui/label-search-bar.tsx
+
 "use client"
+
+
 
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
