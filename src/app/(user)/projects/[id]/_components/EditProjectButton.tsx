@@ -39,6 +39,7 @@ export function EditProjectButton({ project }: EditProjectButtonProps) {
                 </div>
             </button>
 
+            
             <EditProjectModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
