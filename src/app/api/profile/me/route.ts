@@ -17,6 +17,8 @@ const updateProfileSchema = z
   })
   .passthrough()
 
+type UpdateProfileData = z.infer<typeof updateProfileSchema>
+
 export async function PUT(req: Request) {
   try {
     // 1. Authenticate the user
@@ -33,7 +35,7 @@ export async function PUT(req: Request) {
     console.log("Parsed data after validation:", parsedData)
 
     // 3. Clean up the data before updating
-    const updateData: any = { ...parsedData }
+    const updateData: UpdateProfileData = { ...parsedData }
 
     if (!updateData.image || updateData.image === "" || updateData.image === null) {
       delete updateData.image

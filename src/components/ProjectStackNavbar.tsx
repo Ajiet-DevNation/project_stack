@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Dock, DockItem, DockIcon, DockLabel } from "@/components/ui/dock";
-import { LogOut, Home, Plus, Inbox, Search } from "lucide-react";
+import { Plus, Inbox, Search, User as UserIcon } from "lucide-react"; 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { signOut } from "next-auth/react";
 import { InboxPopup } from "./InboxPopup";
 import { getNotificationCount } from "../../actions/notifications";
 import { ActionSearchBar } from "@/components/ui/action-search-bar";
 import { AnimatePresence, motion } from "framer-motion";
+
 
 const DockLogo = () => (
   <Link href="/" className="flex items-center gap-4">
@@ -30,11 +31,13 @@ const DockLogo = () => (
 interface ProjectStackDockProps {
   onOpenCreateModal: () => void;
   profileId?: string;
+  userImage?: string | null; 
 }
 
 export function ProjectStackDock({
   onOpenCreateModal,
   profileId,
+  userImage, 
 }: ProjectStackDockProps) {
   const [showInbox, setShowInbox] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -61,6 +64,7 @@ export function ProjectStackDock({
   const toggleSearch = () => {
     setIsSearchVisible((prev) => !prev);
   };
+
 
   return (
     <>
@@ -94,15 +98,6 @@ export function ProjectStackDock({
 
           <DockItem>
             <DockIcon>
-              <Link href={"/home"} className="cursor-pointer">
-                <Home />
-              </Link>
-            </DockIcon>
-            <DockLabel>Home</DockLabel>
-          </DockItem>
-
-          <DockItem>
-            <DockIcon>
               <button className="cursor-pointer" onClick={toggleSearch}>
                 <Search />
               </button>
@@ -129,12 +124,30 @@ export function ProjectStackDock({
 
           <DockItem>
             <DockIcon>
-              <button className="cursor-pointer" onClick={() => signOut()}>
-                <LogOut />
-              </button>
+              <Link
+                href={profileId ? `/profile/${profileId}` : "/profile"}
+                className="cursor-pointer"
+              >
+                <div className="relative w-8 h-8">
+                  {userImage ? (
+                    <Image
+                      src={userImage}
+                      alt="Profile"
+                      width={32} 
+                      height={32}
+                      className="rounded-full border-2 border-green-500" 
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full border-2 border-green-500 bg-muted flex items-center justify-center">
+                      <UserIcon className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+              </Link>
             </DockIcon>
-            <DockLabel>Sign-out</DockLabel>
+            <DockLabel>Profile</DockLabel>
           </DockItem>
+
         </Dock>
       </div>
 
@@ -156,10 +169,10 @@ export function ProjectStackDock({
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 50 }}
               transition={{ duration: 0.3 }}
-              className="w-full max-w-xl"
+              className="w-full max-w-3xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <ActionSearchBar autoFocus={isSearchVisible} onClose={toggleSearch}/>
+              <ActionSearchBar autoFocus={isSearchVisible} onClose={toggleSearch} />
             </motion.div>
           </motion.div>
         )}

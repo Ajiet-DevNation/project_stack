@@ -34,7 +34,7 @@ export function UserApplications({ applications }: UserApplicationsProps) {
                 <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-medium text-foreground mb-2">No applications yet</h3>
                 <p className="text-muted-foreground">
-                    You haven't applied to any projects yet
+                    You haven&apos;t applied to any projects yet
                 </p>
             </div>
         );

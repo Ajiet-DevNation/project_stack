@@ -95,87 +95,18 @@ export function DeleteProjectButton({
                                 transition={{ duration: 0.2 }}
                                 className="relative w-full max-w-md bg-card border border-destructive/10 rounded-2xl shadow-2xl overflow-hidden z-[10000]"
                             >
-                                {/* Warning Header */}
-                                <div className="bg-destructive/5 border-b border-destructive/10 px-6 py-4 flex items-center gap-3">
-                                    <div className="p-2 bg-destructive/10 rounded-lg">
-                                        <AlertTriangle className="h-6 w-6 text-destructive" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-destructive">
-                                            Delete Project
-                                        </h3>
-                                        <p className="text-xs text-muted-foreground">
-                                            This action cannot be undone
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Content */}
-                                <div className="p-6 space-y-4">
-                                    <div className="bg-destructive/5 rounded-lg p-4">
-                                        <p className="text-sm text-foreground mb-2">
-                                            This will permanently delete:
-                                        </p>
-                                        <ul className="text-sm text-muted-foreground space-y-1 ml-4 list-disc">
-                                            <li>Project and all its data</li>
-                                            <li>All applications and contributions</li>
-                                            <li>All comments and likes</li>
-                                        </ul>
-                                    </div>
-
-                                    <div>
-                                        <p className="text-sm text-foreground mb-2">
-                                            All applicants and contributors will be notified of this deletion.
-                                        </p>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-semibold text-foreground">
-                                            Type <span className="font-mono text-destructive">{projectTitle}</span> to confirm:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={confirmText}
-                                            onChange={(e) => setConfirmText(e.target.value)}
-                                            placeholder="Enter project name"
-                                            disabled={isDeleting}
-                                            className="w-full px-4 py-2.5 bg-background border border-border focus:ring-none focus:outline-none focus:border-red-400 rounded-lg text-foreground placeholder:text-muted-foreground disabled:opacity-50 transition-colors"
-                                            autoFocus
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Actions */}
-                                <div className="bg-muted/30 px-6 py-4 flex gap-3 justify-end border-t border-border">
-                                    <button
-                                        onClick={() => {
-                                            setShowConfirm(false);
-                                            setConfirmText("");
-                                        }}
-                                        disabled={isDeleting}
-                                        className="px-4 py-2 text-sm font-medium text-foreground bg-secondary hover:bg-secondary/80 rounded-lg transition-colors disabled:opacity-50"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleDelete}
-                                        disabled={isDeleting || confirmText !== projectTitle}
-                                        className="px-4 py-2 text-sm font-semibold text-destructive-foreground bg-destructive hover:bg-destructive/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                    >
-                                        {isDeleting ? (
-                                            <>
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                Deleting...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Trash2 className="h-4 w-4" />
-                                                Delete Project
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </motion.div>
+                                {isDeleting ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                                        <span>{`Deleting\u2026`}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Trash2 className="h-4 w-4" />
+                                        <span>Delete</span>
+                                    </>
+                                )}
+                            </button>
                         </div>
                     )}
                 </AnimatePresence>,
