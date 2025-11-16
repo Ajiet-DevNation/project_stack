@@ -1,0 +1,47 @@
+name: Next.js + Prisma CI/CD 
+
+on: 
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs: 
+    build-and-deploy:
+        runs-on: ${{ matrix.os }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          
+        strategy:
+            matrix:
+                os: [ubuntu-latest, windows-latest]
+                node-version: [22]
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: ${{ matrix['node-version'] }}
+
+            - name: Cache node_modules
+              uses: actions/cache@v4
+              with: 
+                path: ~/.npm
+                key: ${{runner.os}}-node-${{ hashFiles('**/package-lock.json')}}
+                restore-keys: |
+                    ${{runner.os}}-node-
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Generate Prisma client
+              run: npx prisma generate
+
+            - name: Run migrations (optional)
+              run: npx prisma migrate deploy
+
+            - name: Run ESLint
+              run: npm run lint
