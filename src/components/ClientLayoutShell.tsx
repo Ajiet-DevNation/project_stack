@@ -56,6 +56,7 @@ export function ClientLayoutShell({ children }: ClientLayoutShellProps) {
         <ProjectStackDock 
           onOpenCreateModal={handleCreateClick} 
           profileId={profileId} 
+          userImage={session?.user?.image}
         /> 
       )}
       <CreateProjectModal 

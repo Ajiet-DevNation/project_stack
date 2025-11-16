@@ -5,10 +5,8 @@ import GoogleProvider from "next-auth/providers/google";
 import { db } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
-  // Use Prisma to store user, account, and session data
   adapter: PrismaAdapter(db),
   
-  // Configure one or more authentication providers
   providers: [
     GithubProvider({
       clientId: process.env.AUTH_GITHUB_ID!,
@@ -20,40 +18,39 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  // Force JWT strategy for session management
   session: {
     strategy: "jwt",
   },
 
-  // Callbacks to control and customize the session flow
   callbacks: {
-    // This callback runs whenever a JWT is created or updated.
-    async jwt({ token, user, trigger }) {
-      // 1. On initial sign-in, add user data to the token
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // The 'user' object from the database might have a default 'onboarded' value
-        const dbUser = await db.user.findUnique({ where: { id: user.id } });
-        token.onboarded = dbUser?.onboarded ?? false;
       }
-      // 2. Only refresh from DB on explicit update triggers, not on every request
-      else if (trigger === "update") {
-        const dbUser = await db.user.findUnique({
-          where: { id: token.id as string },
-        });
-        if (dbUser) {
-          token.onboarded = dbUser.onboarded;
-        }
+
+      const dbUser = await db.user.findUnique({
+        where: { id: token.id as string },
+        include: {
+          profile: {
+            select: {
+              image: true,
+            },
+          },
+        },
+      });
+
+      if (dbUser) {
+        token.onboarded = dbUser.onboarded;
+        token.image = dbUser.profile?.image ?? dbUser.image;
       }
 
       return token;
     },
-    // This callback runs when a session is accessed by the client.
     async session({ session, token }) {
-      // Add custom properties from the token to the client-side session object
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.onboarded = token.onboarded as boolean;
+        session.user.image = token.image;
       }
       return session;
     },

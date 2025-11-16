@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -13,6 +13,7 @@ import {
   Eye
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export interface Project {
   id: string
@@ -68,11 +69,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
     <Card className="border border-border/20 bg-background/20 backdrop-blur-sm hover:bg-background/30 transition-all duration-300 group">
       <CardHeader className="p-0">
         {project.thumbnail && (
-          <div className="relative overflow-hidden rounded-t-lg">
-            <img
+          <div className="relative h-48 overflow-hidden rounded-t-lg">
+            <Image
               src={project.thumbnail}
               alt={project.title}
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
             <Badge 

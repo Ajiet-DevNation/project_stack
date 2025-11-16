@@ -1,5 +1,5 @@
 import { db } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+// import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 export async function GET(

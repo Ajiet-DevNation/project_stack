@@ -6,6 +6,7 @@ interface ProfilePageProps {
   }
 }
 
-export default function ProfilePage({ params }: ProfilePageProps) {
-  return <ProfilePageWrapper profileId={params.profileId} />
+export default async function ProfilePage({ params }: ProfilePageProps) {
+  const { profileId } = await params;
+  return <ProfilePageWrapper profileId={profileId} />
 }

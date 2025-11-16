@@ -327,6 +327,13 @@ export async function getUserContributions(profileId: string) {
                 project: {
                     include: {
                         author: true,
+                        _count: {
+                            select: {
+                                likes: true,
+                                comments: true,
+                                contributors: true,
+                            },
+                        },
                     },
                 },
             },
