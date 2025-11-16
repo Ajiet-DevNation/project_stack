@@ -15,12 +15,13 @@ import {
   Code,
   Users,
   Trophy,
-  Building2
+  Building2,
+  LogOut
 } from "lucide-react";
 import { ProjectCard } from "./ProjectCard";
 import { ProfileEditModal } from "./ProfileEditModal";
 import axios from "axios";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { getUserContributions } from "../../../../../../actions/applications";
 import { Project, Profile, Contribution } from "@/types/profile";
 import Loader from "@/components/Loader";
@@ -207,6 +208,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                         initial={{ opacity: 0, scale: 0 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.5 }}
+                        className="flex flex-col gap-4"
                       >
                         <Button
                           onClick={() => setIsEditModalOpen(true)}
@@ -214,6 +216,13 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                         >
                           <Edit3 className="w-4 h-4 mr-2" />
                           Edit Profile
+                        </Button>
+                        <Button
+                          onClick={() => signOut()}
+                          className="bg-primary/80 hover:bg-primary/90 backdrop-blur-sm"
+                        >
+                          <LogOut className="w-4 h-4 mr-2" />
+                          Sign-Out
                         </Button>
                       </motion.div>
                     )}

@@ -59,7 +59,7 @@ export default function ProjectCard() {
     }
 
     fetchProjects();
-  }, []);
+  });
 
   if (loading) {
     return (
@@ -76,6 +76,7 @@ export default function ProjectCard() {
         {/* <div className="space-y-6 h-[calc(100vh-120px)] overflow-y-auto pr-2"> */}
         <div className="space-y-6 h-full overflow-y-auto pr-2 pt-2">
           {projects.map((project) => (
+            
             <ProjectShowcaseCard
               key={project.id}
               title={project.title}
