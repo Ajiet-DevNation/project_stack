@@ -83,6 +83,8 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder files (images, etc.)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    // Exclude API, Next internals and common static asset extensions so requests
+    // for files in /public (images, icons) are not intercepted by auth middleware.
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|avif|ico)).*)",
   ],
 };
