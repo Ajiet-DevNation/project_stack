@@ -156,7 +156,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 href="/home"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                ← Back to Projects
+                ← Back to Home
               </Link>
             </nav>
           </div>

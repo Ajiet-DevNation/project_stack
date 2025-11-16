@@ -22,47 +22,13 @@ import {
 import { ProjectCard } from "./ProjectCard";
 import { ProfileEditModal } from "./ProfileEditModal";
 import axios from "axios";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { useSession } from "next-auth/react";
 import { getUserContributions } from "../../../../../../actions/applications";
+import { Project, Profile, Contribution } from "@/types/profile";
+import Loader from "@/components/Loader";
 
 interface ProfileContentProps {
   profileId?: string;
-}
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  liveUrl?: string;
-  thumbnail?: string;
-  endDate: string;
-  githubLink?: string;
-  isActive: boolean;
-  postedOn: string;
-  projectStatus: string;
-  requiredSkills: string[];
-  startDate: string;
-  _count?: {
-    likes: number;
-    comments: number;
-    contributors: number;
-  };
-}
-
-interface Profile {
-  id: string;
-  name: string;
-  image?: string;
-  branch?: string;
-  year?: string;
-  section?: string;
-  college?: string;
-  bio?: string;
-  skills: string[];
-  projects: Project[];
-  userId: string;
 }
 
 function ProfileContent({ profileId }: ProfileContentProps) {
@@ -71,8 +37,8 @@ function ProfileContent({ profileId }: ProfileContentProps) {
   const [activeTab, setActiveTab] = useState("projects");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { data: session, status } = useSession();
-  const [contributions, setContributions] = useState<any[]>([]);
+  const { data: session, update } = useSession();
+  const [contributions, setContributions] = useState<Contribution[]>([]);
 
   let isOwnProfile = false;
 
@@ -83,22 +49,28 @@ function ProfileContent({ profileId }: ProfileContentProps) {
         setError(null);
         // If no profileId provided, fetch current user's profile
         const endpoint = profileId ? `/api/profile/${profileId}` : `/api/profile/me`;
-        console.log("Fetching from:", endpoint);
+        // console.log("Fetching from:", endpoint);
 
         const { data } = await axios.get(endpoint);
-        console.log("Profile data received:", data);
+        // console.log("Profile data received:", data);
         setProfile(data);
 
         if (data.id) {
           const contributionsResult = await getUserContributions(data.id);
-          if (contributionsResult.success) {
-            setContributions(contributionsResult.data || []);
+          if (contributionsResult.success && contributionsResult.data) {
+            setContributions(contributionsResult.data.map(c => ({ id: c.id, project: c.project as Project })));
           }
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching Profile", error);
-        const errorMessage = error.response?.data || error.message || "Failed to load profile";
-        setError(errorMessage);
+        if (axios.isAxiosError(error)) {
+          const errorMessage = error.response?.data || error.message || "Failed to load profile";
+          setError(errorMessage);
+        } else if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred while fetching the profile.");
+        }
       } finally {
         setLoading(false);
       }
@@ -107,13 +79,13 @@ function ProfileContent({ profileId }: ProfileContentProps) {
     fetchProfile();
   }, [profileId]);
 
-  console.log("Ajji Shunti myan", session?.user);
   if (session?.user.id == profile?.userId) isOwnProfile = true;
 
-  const handleProfileUpdate = async (updatedData: any) => {
+  const handleProfileUpdate = async (updatedData: Partial<Profile>) => {
     try {
       const { data } = await axios.put(`/api/profile/me`, updatedData);
       setProfile(data);
+      await update();
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("Error updating profile", error);
@@ -124,8 +96,9 @@ function ProfileContent({ profileId }: ProfileContentProps) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
+          {/* <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading profile...</p> */}
+          <Loader/>
         </div>
       </div>
     );
@@ -181,7 +154,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 >
                   <Avatar className="w-24 h-24 border-4 border-primary/20">
-                    <AvatarImage src={profile.image} alt={profile.name} />
+                    <AvatarImage src={isOwnProfile ? session?.user?.image ?? profile.image ?? undefined : profile.image ?? undefined} alt={profile.name} />
                     <AvatarFallback className="text-2xl font-semibold bg-primary/10">
                       {profile.name?.split(" ").map(n => n[0]).join("")}
                     </AvatarFallback>
@@ -368,6 +341,12 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                         <ProjectCard
                           project={{
                             ...project,
+                            liveUrl: project.liveUrl ?? undefined,
+                            thumbnail: project.thumbnail ?? undefined,
+                            endDate: project.endDate ? new Date(project.endDate).toISOString() : undefined,
+                            githubLink: project.githubLink ?? undefined,
+                            postedOn: new Date(project.postedOn).toISOString(),
+                            startDate: project.startDate ? new Date(project.startDate).toISOString() : undefined,
                             requiredSkills: project.requiredSkills || [],
                             likes: project._count?.likes || 0,
                             comments: project._count?.comments || 0,
@@ -397,7 +376,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
               {contributions.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <AnimatePresence>
-                    {contributions.map((contribution: any, index: number) => (
+                    {contributions.map((contribution, index) => (
                       <motion.div
                         key={contribution.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -410,15 +389,15 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                             id: contribution.project.id,
                             title: contribution.project.title,
                             description: contribution.project.description,
-                            liveUrl: contribution.project.liveUrl,
-                            thumbnail: contribution.project.thumbnail,
-                            endDate: contribution.project.endDate,
-                            githubLink: contribution.project.githubLink,
+                            liveUrl: contribution.project.liveUrl ?? undefined,
+                            thumbnail: contribution.project.thumbnail ?? undefined,
+                            endDate: contribution.project.endDate ? new Date(contribution.project.endDate).toISOString() : undefined,
+                            githubLink: contribution.project.githubLink ?? undefined,
                             isActive: contribution.project.isActive,
-                            postedOn: contribution.project.postedOn,
+                            postedOn: new Date(contribution.project.postedOn).toISOString(),
                             projectStatus: contribution.project.projectStatus,
                             requiredSkills: contribution.project.requiredSkills || [],
-                            startDate: contribution.project.startDate,
+                            startDate: contribution.project.startDate ? new Date(contribution.project.startDate).toISOString() : undefined,
                             likes: contribution.project._count?.likes || 0,
                             comments: contribution.project._count?.comments || 0,
                             contributors: contribution.project._count?.contributors || 0
