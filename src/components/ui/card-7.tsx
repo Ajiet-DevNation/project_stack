@@ -162,13 +162,12 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
               <h4 className="font-semibold text-foreground text-xs tracking-wide">
                 DESCRIPTION
               </h4>
-              <p className="text-sm text-muted-foreground leading-relaxed mt-2 line-clamp-3">
+              <p className="text-sm text-muted-foreground leading-relaxed mt-2 line-clamp-2">
                 {description}
               </p>
             </div>
           </div>
 
-          {/* Tech Stack Section (shown on hover) */}
           {techStack.length > 0 && (
             <div className="transition-all duration-500 ease-in-out opacity-0 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-96 group-hover:mt-8 group-hover:mb-6">
               <h4 className="font-semibold text-foreground mb-2 text-xs tracking-wide">
