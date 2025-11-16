@@ -128,14 +128,14 @@ export function ProjectStackDock({
                 href={profileId ? `/profile/${profileId}` : "/profile"}
                 className="cursor-pointer"
               >
-                <div className="relative w-8 h-8">
+                <div className="relative w-8 h-8 rounded-full border-2 border-gray-400 overflow-hidden bg-black/20 flex items-center justify-center">
                   {userImage ? (
                     <Image
                       src={userImage}
                       alt="Profile"
                       width={32} 
                       height={32}
-                      className="rounded-full border-2 border-green-500" 
+                      className="rounded-full object-contain" 
                     />
                   ) : (
                     <div className="w-full h-full rounded-full border-2 border-green-500 bg-muted flex items-center justify-center">
