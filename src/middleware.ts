@@ -1,26 +1,88 @@
-// This line imports and exports the default NextAuth.js middleware.
-// It automatically handles the session check and redirection.
 import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
-export default withAuth({
-   callbacks: {
-    authorized: ({ token }) => {
-      // `token` exists only if the user is signed in
-      return !!token;
+export default withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token;
+    const pathname = req.nextUrl.pathname;
+
+    // Define public routes (accessible without auth)
+    const isPublicRoute = pathname === "/";
+    
+    // Define onboarding route
+    const isOnboardingRoute = pathname.startsWith("/onboarding");
+    
+    // Check if user is authenticated
+    const isAuthenticated = !!token;
+    
+    // Check if user is onboarded
+    const isOnboarded = token?.onboarded === true;
+
+    // Case 1: Not authenticated
+    if (!isAuthenticated) {
+      // Allow access to landing page
+      if (isPublicRoute) {
+        return NextResponse.next();
+      }
+      // Redirect to landing page for any other route
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    // Case 2: Authenticated but not onboarded
+    if (isAuthenticated && !isOnboarded) {
+      // Allow access to onboarding page
+      if (isOnboardingRoute) {
+        return NextResponse.next();
+      }
+      // Allow access to landing page (in case they want to sign out)
+      if (isPublicRoute) {
+        return NextResponse.next();
+      }
+      // Redirect all other routes to onboarding
+      return NextResponse.redirect(new URL("/onboarding", req.url));
+    }
+
+    // Case 3: Authenticated and onboarded
+    if (isAuthenticated && isOnboarded) {
+      // Prevent access to onboarding page if already onboarded
+      if (isOnboardingRoute) {
+        return NextResponse.redirect(new URL("/home", req.url));
+      }
+      // Redirect from landing page to home if already authenticated and onboarded
+      if (isPublicRoute) {
+        return NextResponse.redirect(new URL("/home", req.url));
+      }
+      // Allow access to all other routes
+      return NextResponse.next();
+    }
+
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      // This authorized callback is required, but we handle logic in the middleware function above
+      authorized: ({ token }) => {
+        // Return true to let the middleware function handle the logic
+        return true;
+      },
     },
-  },
-  // 👇 Redirect path if unauthorized
-  pages: {
-    signIn: "/", 
-  },
-});
+    pages: {
+      signIn: "/",
+    },
+  }
+);
 
-// The 'config' object specifies which routes the middleware should run on.
+// Protect all routes except static files and API routes
 export const config = {
-  //    This matcher array defines the paths that this middleware will protect.
   matcher: [
-    "/dashboard/:path*", // frontend pages
-    "/api/protected/:path*", // backend API routes you want to protect
-    "/onbaording/:path*" 
+    /*
+     * Match all request paths except:
+     * - api/auth (auth endpoints)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder files (images, etc.)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
