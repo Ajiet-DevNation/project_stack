@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../auth/[...nextauth]/route";
 import { z } from "zod";
 import { NextResponse } from "next/server";
+import { createNotification } from "../../../../../../actions/notifications";
 
 export async function POST(
   req: Request,
@@ -25,6 +26,14 @@ export async function POST(
     // 3. Find the user's profile to get their profile ID
     const userProfile = await db.profile.findUnique({
       where: { userId: session.user.id },
+      select: {
+        id: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     if (!userProfile) {
@@ -33,7 +42,21 @@ export async function POST(
       });
     }
 
-    // 4. Check if the user has already liked this project
+    // 4. Get project details including the author
+    const project = await db.project.findUnique({
+      where: { id: validatedProjectId },
+      select: {
+        id: true,
+        title: true,
+        authorId: true,
+      },
+    });
+
+    if (!project) {
+      return new Response("Project not found", { status: 404 });
+    }
+
+    // 5. Check if the user has already liked this project
     const existingLike = await db.like.findUnique({
       where: {
         profileId_projectId: {
@@ -43,12 +66,24 @@ export async function POST(
       },
     });
 
-    // 5. Toggle the like status
+    // 6. Toggle the like status
     if (existingLike) {
       // If it exists, unlike the project
       await db.like.delete({
         where: { id: existingLike.id },
       });
+
+      // Optional: Delete the notification when unliking
+      // You can choose to keep notifications even after unliking
+      await db.notification.deleteMany({
+        where: {
+          recipientId: project.authorId,
+          projectId: validatedProjectId,
+          type: "LIKE",
+          // Only delete if it was created by this user (you might need to add a senderId field)
+        },
+      });
+
       return NextResponse.json({ message: "Unliked" }, { status: 200 });
     } else {
       // If it doesn't exist, like the project
@@ -58,6 +93,17 @@ export async function POST(
           projectId: validatedProjectId,
         },
       });
+
+      // Create notification for the project owner (only if they're not liking their own project)
+      if (project.authorId !== userProfile.id) {
+        await createNotification({
+          recipientId: project.authorId,
+          message: `${userProfile.user.name} liked your project "${project.title}"`,
+          type: "LIKE",
+          projectId: validatedProjectId,
+        });
+      }
+
       return NextResponse.json({ message: "Liked" }, { status: 201 });
     }
   } catch (error) {

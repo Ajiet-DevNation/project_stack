@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -137,7 +136,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 pt-2">
-          <Link href={`projects/${project.id}`}>
+          <Link href={`/projects/${project.id}`}>
             <Button size="sm" className="flex-1 bg-primary/80 hover:bg-primary/90">
               <Eye className="w-3 h-3 mr-1" />
               View
