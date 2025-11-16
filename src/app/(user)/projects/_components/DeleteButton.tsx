@@ -93,12 +93,12 @@ export function DeleteProjectButton({
                                 {isDeleting ? (
                                     <>
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                                        Deleting...
+                                        <span>{`Deleting\u2026`}</span>
                                     </>
                                 ) : (
                                     <>
                                         <Trash2 className="h-4 w-4" />
-                                        Delete
+                                        <span>Delete</span>
                                     </>
                                 )}
                             </button>

@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { profileSchema, ProfileFormData } from "@/lib/validations/profile"
 import {
     Dialog,
     DialogContent,
@@ -19,25 +20,13 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { X, Plus, User, Save } from "lucide-react"
 import axios from "axios"
-
-const profileSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    section: z.string().min(1, "Section is required"),
-    branch: z.string().min(2, "Branch is required"),
-    year: z.string().min(1, "Year is required"),
-    college: z.string().min(2, "College is required"),
-    bio: z.string().max(300, "Bio must be less than 300 characters").optional(),
-    image: z.string().url("Invalid image URL").optional().or(z.literal("")),
-    skills: z.array(z.string().min(1)).min(1, "At least one skill is required"),
-})
-
-type ProfileFormData = z.infer<typeof profileSchema>
+import { Profile } from "@/types/profile"
 
 interface ProfileEditModalProps {
     isOpen: boolean
     onClose: () => void
-    profile: any
-    onSave: (data: any) => void
+    profile: Profile | null
+    onSave: (data: Partial<Profile>) => void
 }
 
 export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEditModalProps) {
@@ -51,22 +40,29 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
         setValue,
         watch,
         formState: { errors },
-        reset
+        reset,
     } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
-        defaultValues: {
-            name: profile?.name || "",
-            section: profile?.section || "",
-            branch: profile?.branch || "",
-            year: profile?.year || "",
-            college: profile?.college || "",
-            bio: profile?.bio || "",
-            image: profile?.image || "",
-            skills: profile?.skills || [],
-        }
     })
 
-    const skills = watch("skills")
+    // Use an effect to reset the form when the profile data changes
+    useEffect(() => {
+        if (profile) {
+            reset({
+                name: profile.name || "",
+                section: profile.section || "",
+                branch: profile.branch || "",
+                year: profile.year || "",
+                college: profile.college || "",
+                bio: profile.bio || "",
+                image: profile.image || "",
+                skills: profile.skills || [],
+            });
+        }
+    }, [profile, reset]);
+
+
+    const skills = watch("skills") || []
 
     const addSkill = (skillToAdd: string) => {
         const trimmedSkill = skillToAdd.trim()
@@ -81,38 +77,30 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
     }
 
     const onSubmit = async (data: ProfileFormData) => {
-        // Prevent double submission with lock
-        if (submitLockRef.current) {
-            console.log("Submission already in progress, ignoring...")
-            return
-        }
+        if (submitLockRef.current) return;
 
         submitLockRef.current = true
         setIsSubmitting(true)
         
         try {
-            // Remove empty image field
             const submitData = { ...data }
-            if (!submitData.image || submitData.image === "") {
+            if (!submitData.image) {
                 delete submitData.image
             }
             
-            console.log("Sending data:", submitData)
             const response = await axios.put(`/api/profile/me`, submitData)
-            console.log("Update successful:", response.data)
             
             onSave(response.data)
             onClose()
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error updating profile:", error)
-            if (Array.isArray(error.response?.data)) {
-                error.response.data.forEach((err: any) => {
-                    console.error("Validation error:", err)
+            if (axios.isAxiosError(error) && error.response && Array.isArray(error.response.data)) {
+                error.response.data.forEach((err: { message: string }) => {
+                    console.error("Validation error:", err.message)
                 })
             }
         } finally {
             setIsSubmitting(false)
-            // Release lock after a delay to prevent rapid resubmission
             setTimeout(() => {
                 submitLockRef.current = false
             }, 1000)
@@ -140,7 +128,7 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
                     {/* Profile Image */}
                     <div className="flex items-center gap-4">
                         <Avatar className="w-20 h-20 border-2 border-primary/20">
-                            <AvatarImage src={watch("image")} alt={watch("name")} />
+                            <AvatarImage src={watch("image") ?? undefined} alt={watch("name")} />
                             <AvatarFallback className="text-lg bg-primary/10">
                                 {watch("name")?.split(' ').map(n => n[0]).join('') || 'U'}
                             </AvatarFallback>
