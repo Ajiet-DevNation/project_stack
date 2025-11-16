@@ -1,5 +1,4 @@
 import DemoOne from "@/components/ShaderBackground";
-import { ExternalLink, Github, MessageCircle } from "lucide-react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,6 +9,7 @@ import { db } from "@/lib/prisma";
 import { ApplyButton } from "../_components/ApplyButton";
 import { DeleteProjectButton } from "../_components/DeleteButton";
 import LikeButton from "@/components/LikeButton";
+import { ExternalLink, Github } from "lucide-react";
 
 interface ProjectPageProps {
   params: { id: string };
