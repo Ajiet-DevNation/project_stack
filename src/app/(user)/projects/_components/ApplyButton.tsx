@@ -45,7 +45,7 @@ export function ApplyButton({
         return (
             <Button
                 disabled
-                className="inline-flex w-full items-center gap-2  bg-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-500/30 cursor-not-allowed"
+                className="inline-flex items-center gap-2 bg-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-500/30 cursor-not-allowed"
             >
                 <Check className="h-4 w-4" />
                 Already Contributing
@@ -57,7 +57,7 @@ export function ApplyButton({
         return (
             <Button
                 disabled
-                className="inline-flex items-center gap-2 bg-yellow-500/20 w-full text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30 cursor-not-allowed"
+                className="inline-flex items-center gap-2 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30 cursor-not-allowed"
             >
                 <Clock className="h-4 w-4" />
                 Application {applicationStatus}
@@ -69,7 +69,7 @@ export function ApplyButton({
         <Button
             onClick={handleApply}
             disabled={loading}
-            className="inline-flex items-center gap-2 bg-primary hover:opacity-90 w-full transition-all shadow-md"
+            className="inline-flex items-center gap-2 bg-primary hover:opacity-90 transition-all shadow-md"
         >
             <UserPlus className="h-4 w-4" />
             {loading ? 'Applying...' : 'Apply to Project'}
