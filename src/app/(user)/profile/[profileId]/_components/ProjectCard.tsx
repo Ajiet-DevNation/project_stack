@@ -10,7 +10,8 @@ import {
   MessageCircle, 
   Users, 
   Calendar,
-  Eye
+  Eye,
+  Code
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -31,13 +32,7 @@ export interface Project {
   likes: number
   comments: number
   contributors: number
-  _count?: {
-    likes: number
-    comments: number
-    contributors: number
-  }
 }
-
 
 interface ProjectCardProps {
   project: Project
@@ -66,9 +61,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
   }
 
   return (
-    <Card className="border border-border/20 bg-background/20 backdrop-blur-sm hover:bg-background/30 transition-all duration-300 group">
+    <Card className="border border-border/20 bg-background/20 backdrop-blur-sm hover:bg-background/30 transition-all duration-300 group h-full flex flex-col">
       <CardHeader className="p-0">
-        {project.thumbnail && (
+        {project.thumbnail ? (
           <div className="relative h-48 overflow-hidden rounded-t-lg">
             <Image
               src={project.thumbnail}
@@ -83,77 +78,93 @@ export function ProjectCard({ project }: ProjectCardProps) {
               {project.projectStatus}
             </Badge>
           </div>
+        ) : (
+          <div className="relative h-48 bg-gradient-to-br from-primary/10 to-primary/5 rounded-t-lg flex items-center justify-center">
+            <Code className="w-16 h-16 text-primary/20" />
+            <Badge 
+              className={`absolute top-3 right-3 ${getStatusColor(project.projectStatus)} backdrop-blur-sm`}
+            >
+              {project.projectStatus}
+            </Badge>
+          </div>
         )}
       </CardHeader>
       
-      <CardContent className="p-6 space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+      <CardContent className="p-4 space-y-3 flex-1 flex flex-col">
+        {/* Title & Description */}
+        <div className="flex-1">
+          <h3 className="text-base font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
             {project.title}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-3">
+          <p className="text-xs text-muted-foreground line-clamp-2">
             {project.description}
           </p>
         </div>
 
         {/* Skills */}
-        <div className="flex flex-wrap gap-1">
-          {project.requiredSkills.slice(0, 3).map((skill) => (
-            <Badge 
-              key={skill} 
-              variant="outline" 
-              className="text-xs bg-primary/10 border-primary/20 text-foreground"
-            >
-              {skill}
-            </Badge>
-          ))}
-          {project.requiredSkills.length > 3 && (
-            <Badge variant="outline" className="text-xs bg-muted/20 border-border/20">
-              +{project.requiredSkills.length - 3}
-            </Badge>
-          )}
-        </div>
+        {project.requiredSkills && project.requiredSkills.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {project.requiredSkills.slice(0, 3).map((skill) => (
+              <Badge 
+                key={skill} 
+                variant="outline" 
+                className="text-xs bg-primary/10 border-primary/20 text-foreground"
+              >
+                {skill}
+              </Badge>
+            ))}
+            {project.requiredSkills.length > 3 && (
+              <Badge variant="outline" className="text-xs bg-muted/20 border-border/20">
+                +{project.requiredSkills.length - 3}
+              </Badge>
+            )}
+          </div>
+        )}
 
         {/* Stats */}
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/20">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <Heart className="w-3 h-3" />
-              <span>{project.likes}</span>
+              <Heart className="w-3.5 h-3.5" />
+              <span>{project.likes || 0}</span>
             </div>
             <div className="flex items-center gap-1">
-              <MessageCircle className="w-3 h-3" />
-              <span>{project.comments}</span>
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>{project.comments || 0}</span>
             </div>
             <div className="flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              <span>{project.contributors}</span>
+              <Users className="w-3.5 h-3.5" />
+              <span>{project.contributors || 0}</span>
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Calendar className="w-3 h-3" />
+            <Calendar className="w-3.5 h-3.5" />
             <span>{formatDate(project.postedOn)}</span>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 pt-2">
-          <Link href={`/projects/${project.id}`}>
-            <Button size="sm" className="flex-1 bg-primary/80 hover:bg-primary/90">
+        <div className="flex items-center gap-2">
+          <Link href={`/projects/${project.id}`} className="flex-1">
+            <Button size="sm" className="w-full bg-primary/80 hover:bg-primary/90 text-xs">
               <Eye className="w-3 h-3 mr-1" />
               View
             </Button>
           </Link>
           
           {project.liveUrl && (
-            <Button size="sm" variant="outline" className="bg-background/20 border-border/20">
-              <ExternalLink className="w-3 h-3" />
-            </Button>
+            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+              <Button size="sm" variant="outline" className="bg-background/20 border-border/20">
+                <ExternalLink className="w-3 h-3" />
+              </Button>
+            </a>
           )}
           {project.githubLink && (
-            <Button size="sm" variant="outline" className="bg-background/20 border-border/20">
-              <Github className="w-3 h-3" />
-            </Button>
+            <a href={project.githubLink} target="_blank" rel="noopener noreferrer">
+              <Button size="sm" variant="outline" className="bg-background/20 border-border/20">
+                <Github className="w-3 h-3" />
+              </Button>
+            </a>
           )}
         </div>
       </CardContent>

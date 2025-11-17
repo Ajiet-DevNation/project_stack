@@ -13,8 +13,6 @@ import {
   Calendar,
   GraduationCap,
   Code,
-  Heart,
-  MessageCircle,
   Users,
   Trophy,
   Building2
@@ -132,8 +130,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
   const stats = [
     { label: "Projects", value: profile.projects?.length || 0, icon: Code },
     { label: "Contributions", value: contributions.length, icon: Users },
-    { label: "Likes Received", value: 42, icon: Heart },
-    { label: "Comments", value: 28, icon: MessageCircle },
+
   ];
   console.log(profile.image);
 
@@ -213,7 +210,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                       >
                         <Button
                           onClick={() => setIsEditModalOpen(true)}
-                          className="bg-primary/80 hover:bg-primary/90 backdrop-blur-sm"
+                          className="bg-primary/80 cursor-pointer hover:bg-primary/90 backdrop-blur-sm"
                         >
                           <Edit3 className="w-4 h-4 mr-2" />
                           Edit Profile
@@ -270,7 +267,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-2 gap-4 mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
@@ -284,7 +281,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
             >
               <Card className="border border-border/20 bg-background/20 backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
-                  <stat.icon className="w-6 h-6 mx-auto mb-2 text-primary" />
+                  <stat.icon className="w-5 h-5 mx-auto mb-2 text-primary" />
                   <div className="text-2xl font-bold text-foreground">{stat.value}</div>
                   <div className="text-xs text-muted-foreground">{stat.label}</div>
                 </CardContent>
@@ -300,17 +297,13 @@ function ProfileContent({ profileId }: ProfileContentProps) {
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="bg-background/20 backdrop-blur-sm border border-border/20">
-              <TabsTrigger value="projects" className="data-[state=active]:bg-primary/20">
+              <TabsTrigger value="projects" className="data-[state=active]:bg-primary/20 cursor-pointer">
                 <Code className="w-4 h-4 mr-2" />
                 Projects
               </TabsTrigger>
-              <TabsTrigger value="contributions" className="data-[state=active]:bg-primary/20">
+              <TabsTrigger value="contributions" className="data-[state=active]:bg-primary/20 cursor-pointer">
                 <Users className="w-4 h-4 mr-2" />
                 Contributions
-              </TabsTrigger>
-              <TabsTrigger value="activity" className="data-[state=active]:bg-primary/20">
-                <Trophy className="w-4 h-4 mr-2" />
-                Activity
               </TabsTrigger>
             </TabsList>
 
@@ -319,12 +312,6 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                 <h2 className="text-xl font-semibold text-foreground">
                   Projects ({profile.projects?.length || 0})
                 </h2>
-                {isOwnProfile && (
-                  <Button variant="outline" className="bg-background/20 backdrop-blur-sm border-border/20">
-                    <Code className="w-4 h-4 mr-2" />
-                    New Project
-                  </Button>
-                )}
               </div>
 
               {profile.projects && profile.projects.length > 0 ? (

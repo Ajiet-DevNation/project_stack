@@ -13,7 +13,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 
 const DockLogo = () => (
-  <Link href="/" className="flex items-center gap-4">
+  <Link href="/home" className="flex items-center gap-4">
     <div
       className={cn(
         "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center",
@@ -22,7 +22,7 @@ const DockLogo = () => (
     >
       <span className="text-primary-foreground font-bold text-sm">PS</span>
     </div>
-    <span className="font-bold text-lg text-foreground name-glow">
+    <span className="font-bold text-lg text-foreground ">
       ProjectStack
     </span>
   </Link>
