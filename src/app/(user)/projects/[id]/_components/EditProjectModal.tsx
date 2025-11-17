@@ -25,6 +25,8 @@ interface EditProjectModalProps {
     };
 }
 
+type ProjectStatus = "Planning" | "Active" | "Completed";
+
 export function EditProjectModal({ isOpen, onClose, project }: EditProjectModalProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -189,7 +191,7 @@ export function EditProjectModal({ isOpen, onClose, project }: EditProjectModalP
                                                 </label>
                                                 <select
                                                     value={formData.projectStatus}
-                                                    onChange={(e) => setFormData({ ...formData, projectStatus: e.target.value as any })}
+                                                    onChange={(e) => setFormData({ ...formData, projectStatus: e.target.value as ProjectStatus })}
                                                     className="w-full px-4 py-2.5 bg-background border-2 border-border rounded-lg transition-colors hover:border-primary/50 text-foreground"
                                                 >
                                                     <option value="Planning">Planning</option>

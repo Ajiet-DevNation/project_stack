@@ -48,7 +48,7 @@ export function ApplicationsList({ applications, authorId }: ApplicationListProp
             } else {
                 alert(result.message);
             }
-        } catch (error) {
+        } catch {
             alert('An error occurred');
         } finally {
             setLoading(null);
@@ -65,7 +65,7 @@ export function ApplicationsList({ applications, authorId }: ApplicationListProp
             } else {
                 alert(result.message);
             }
-        } catch (error) {
+        } catch {
             alert('An error occurred');
         } finally {
             setLoading(null);

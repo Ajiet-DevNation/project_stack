@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Settings, X } from "lucide-react";
+import { useState, useRef } from "react";
+import { Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DeleteProjectButton } from "../../_components/DeleteButton";
 import { EditProjectButton } from "./EditProjectButton";

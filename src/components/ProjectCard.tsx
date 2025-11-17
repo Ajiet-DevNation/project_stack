@@ -31,14 +31,6 @@ interface Project {
   };
 }
 
-interface ApiResponse {
-  projects: Project[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-// Demo component to showcase the ProjectCard
 export default function ProjectCard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +56,6 @@ export default function ProjectCard() {
   if (loading) {
     return (
       <div className="relative z-10 flex min-h-screen w-full items-center justify-center p-4">
-        {/* Updated this line to use the theme's foreground color */}
         <Loader />
       </div>
     );
@@ -89,8 +80,6 @@ export default function ProjectCard() {
               githubUrl={project.githubLink || undefined}
               techStack={project.requiredSkills.map((skill) => ({
                 name: skill,
-                // This is fine, as the icon inherits its color
-                // from the text-muted-foreground in the child component.
                 icon: <Code2 className="w-5 h-5" />,
               }))}
               aria-label={`Project card for ${project.title}`}

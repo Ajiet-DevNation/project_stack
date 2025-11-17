@@ -5,7 +5,6 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     const pathname = req.nextUrl.pathname;
-
     // Define public routes (accessible without auth)
     const isPublicRoute = pathname === "/";
     
@@ -61,7 +60,7 @@ export default withAuth(
   {
     callbacks: {
       // This authorized callback is required, but we handle logic in the middleware function above
-      authorized: ({ token }) => {
+      authorized: ({ }) => {
         // Return true to let the middleware function handle the logic
         return true;
       },

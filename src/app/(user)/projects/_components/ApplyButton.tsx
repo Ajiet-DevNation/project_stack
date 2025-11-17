@@ -34,7 +34,7 @@ export function ApplyButton({
             } else {
                 alert(result.message);
             }
-        } catch (error) {
+        } catch {
             alert('An error occurred while applying');
         } finally {
             setLoading(false);

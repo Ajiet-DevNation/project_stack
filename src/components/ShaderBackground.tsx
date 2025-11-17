@@ -57,25 +57,13 @@ const themePalettes = {
 }
 
 export default function DemoOne() {
-  const [intensity, setIntensity] = useState(1.5)
-  const [speed, setSpeed] = useState(1.0)
-  const [isInteracting, setIsInteracting] = useState(false)
-  const [activeEffect, setActiveEffect] = useState("mesh")
-  const [copied, setCopied] = useState(false)
+  const [intensity] = useState(1.5)
+  const [speed] = useState(1.0)
+  const [activeEffect] = useState("mesh")
 
   // --- 3. Use the Hook and Palettes ---
   const theme = useTheme() // Returns 'light' or 'dark'
   const activePalette = themePalettes[theme] // Selects the correct palette
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText("")
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error("Failed to copy text: ", err)
-    }
-  }
 
   return (
     // Use a key to force React to re-render the component

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { removeContributor } from '../../../../../actions/applications';
+import Image from 'next/image';
 
 interface Contributor {
     id: string;
@@ -46,7 +47,7 @@ export function ContributorsList({
             } else {
                 alert(result.message);
             }
-        } catch (error) {
+        } catch {
             alert('An error occurred');
         } finally {
             setLoading(null);
@@ -71,7 +72,7 @@ export function ContributorsList({
                     <div className="flex items-start justify-between">
                         <div className="flex gap-3">
                             {contributor.user.user.image && (
-                                <img
+                                <Image
                                     src={contributor.user.user.image}
                                     alt={contributor.user.name}
                                     className="w-12 h-12 rounded-full"

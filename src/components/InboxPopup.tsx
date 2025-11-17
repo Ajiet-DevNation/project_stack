@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { X, Trash2, ChevronUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { getAllNotifications, deleteNotification } from "../../actions/notifications";
@@ -26,16 +26,23 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
 
-    const fetchNotifications = async () => {
+    const fetchNotifications = useCallback(async () => {
         const result = await getAllNotifications(profileId);
         if (result.success && result.data) {
-            setNotifications(result.data.map(n => ({
-                ...n,
-                createdAt: new Date(n.createdAt)
-            })));
+            setNotifications(
+                result.data.map((n) => ({
+                    ...n,
+                    createdAt: new Date(n.createdAt),
+                }))
+            );
         }
         setLoading(false);
-    };
+    }, [profileId]);
+
+    const handleClose = useCallback(() => {
+        setIsVisible(false);
+        setTimeout(onClose, 300);
+    }, [onClose]);
 
     useEffect(() => {
         fetchNotifications();
@@ -43,11 +50,10 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
 
         const interval = setInterval(fetchNotifications, 5000);
         return () => clearInterval(interval);
-    }, [profileId]);
+    }, [fetchNotifications]);
 
-    // Handle click outside for collapsed view
     useEffect(() => {
-        if (isExpanded) return; // Only for collapsed view
+        if (isExpanded) return;
 
         const handleClickOutside = (event: MouseEvent) => {
             if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
@@ -57,7 +63,7 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [isExpanded]);
+    }, [isExpanded, handleClose]);
 
     const handleDelete = async (notificationId: string, e?: React.MouseEvent) => {
         e?.stopPropagation();
@@ -67,11 +73,6 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                 prev.filter((n) => n.id !== notificationId)
             );
         }
-    };
-
-    const handleClose = () => {
-        setIsVisible(false);
-        setTimeout(onClose, 300);
     };
 
     const handleExpand = (e: React.MouseEvent) => {
@@ -90,7 +91,6 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
     return (
         <>
             {!isExpanded ? (
-                /* ========== COLLAPSED VIEW (Near Inbox Button) ========== */
                 <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-[60]">
                     <div
                         ref={popupRef}
@@ -112,7 +112,6 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                             </div>
                         ) : (
                             <div className="relative w-80">
-                                {/* Stacked cards effect (background cards) */}
                                 {hasMultipleNotifications && (
                                     <>
                                         <div className="absolute top-1.5 left-1.5 right-1.5 h-full bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl -z-10 pointer-events-none" />
@@ -120,10 +119,9 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                                     </>
                                 )}
 
-                                {/* Main notification card */}
                                 <div className="relative bg-black/5 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden group hover:border-black/10 transition-all duration-300">
                                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/0 via-transparent to-blue-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                                    
+
                                     <div className="relative p-4">
                                         <div className="flex items-start gap-3">
                                             <div className="flex-1 min-w-0">
@@ -156,7 +154,6 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                                                 )}
                                             </div>
 
-                                            {/* Delete Button */}
                                             <button
                                                 onClick={(e) => handleDelete(latestNotification.id, e)}
                                                 className="p-2 bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 shrink-0"
@@ -167,7 +164,6 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                                         </div>
                                     </div>
 
-                                    {/* Expand button at bottom */}
                                     <button
                                         onClick={handleExpand}
                                         className="w-full py-3 border-t border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200 flex items-center justify-center group/expand"
@@ -180,15 +176,12 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                     </div>
                 </div>
             ) : (
-                /* ========== EXPANDED VIEW (Full Inbox with Blur Background) ========== */
                 <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-                    {/* Backdrop with blur */}
                     <div
                         className="fixed inset-0 bg-black/10 backdrop-blur-xl transition-opacity duration-300"
                         onClick={handleCollapse}
                     />
 
-                    {/* Main Container */}
                     <div
                         className={`relative w-full max-w-md transition-all duration-500 ${
                             isExpanded
@@ -197,7 +190,6 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                         }`}
                     >
                         <div className=" overflow-hidden">
-                            {/* Header */}
                             <div className=" relative flex items-center justify-between p-4">
                                 <h2 className="text-2xl font-light text-white tracking-wide">
                                     Notifications
@@ -210,7 +202,6 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                                 </button>
                             </div>
 
-                            {/* Notifications List */}
                             <div className="relative px-6 pb-6 pt-4 space-y-3 max-h-[70vh] overflow-y-auto custom-scrollbar">
                                 {notifications.map((notification, index) => (
                                     <div
@@ -222,7 +213,7 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                                     >
                                         <div className="relative bg-black/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 hover:bg-black/20 hover:border-black/10 transition-all duration-300 hover:scale-[1.02]">
                                             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/0 via-transparent to-blue-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                                            
+
                                             <div className="relative flex items-start gap-4">
                                                 <div className="flex-1 min-w-0">
                                                     {notification.projectId ? (
@@ -272,7 +263,6 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
                                 ))}
                             </div>
 
-                            {/* Collapse button */}
                             <button
                                 onClick={handleCollapse}
                                 className="w-full py-4 transition-all duration-200 flex items-center justify-center gap-2 group/collapse"
