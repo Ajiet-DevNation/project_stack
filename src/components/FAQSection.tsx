@@ -6,32 +6,32 @@ const FAQSection: React.FC = () => {
 
   const faqs = [
     {
-      question: "Who is eligible to participate in the hackathon?",
-      answer: "All students from colleges and universities are eligible to participate. Both undergraduate and graduate students can join the hackathon."
+      question: "Who can use this platform?",
+      answer: "This platform is exclusively for students of our college. It's designed to help you connect with fellow students, collaborate on projects, and build amazing things together."
     },
     {
-      question: "Do all team members need to register and pay individually?",
-      answer: "Yes, each team member needs to register individually and pay the registration fee separately to secure their spot in the hackathon."
+      question: "How do I create a project post?",
+      answer: "Click on 'Create Project', fill in your project details including title, description, required skills, and whether you need collaborators. Once posted, other students from our college can view and apply to join your project."
     },
     {
-      question: "Can I participate as an individual or do I need a team?",
-      answer: "You can participate both as an individual or as part of a team. Teams can have 2-4 members maximum."
+      question: "Can I work with students from different departments or years?",
+      answer: "Absolutely! This platform encourages cross-department and cross-year collaboration. Connect with students from any branch or year within our college."
     },
     {
-      question: "Can students from different colleges be in the same team?",
-      answer: "No, all team members must be from the same college or university. Cross-college teams are not allowed."
+      question: "How do I apply to join someone's project?",
+      answer: "Browse through available projects posted by your peers, find one that matches your interests and skills, and click 'Apply'. Share why you're interested and what you can contribute to the project."
     },
     {
-      question: "Will there be mentors or workshops during the hackathon?",
-      answer: "Yes, we will have experienced mentors available throughout the event and conduct workshops on various technologies and development practices."
+      question: "Is this platform free to use?",
+      answer: "Yes, this platform is completely free for all students of our college. It's a DevNation initiative to foster collaboration and innovation within our campus community."
     },
     {
-      question: "What resources will be provided during the hackathon?",
-      answer: "We provide WiFi, power outlets, meals, snacks and technical support throughout the event."
+      question: "What if I have an idea but need teammates with specific skills?",
+      answer: "Create a project post and specify the skills you're looking for (like developers, designers, content writers, etc.). Students with matching skills can discover your project and apply to join."
     },
     {
-      question: "How can I stay informed about event updates and announcements?",
-      answer: "Follow our social media channels, join our Discord server, and check your registered email regularly for all updates and announcements."
+      question: "How do I find projects looking for my skills?",
+      answer: "Use the filter and search features to find projects that need your specific skills. You can also browse all active projects to discover opportunities that match your interests."
     }
   ];
 
