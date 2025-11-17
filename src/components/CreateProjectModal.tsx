@@ -4,6 +4,7 @@ import * as React from "react";
 import { useForm, SubmitHandler, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { PREDEFINED_SKILLS } from "@/lib/skills";
 
 import {
   Dialog,
@@ -20,10 +21,25 @@ import { Badge } from "@/components/ui/badge";
 import { X, Loader2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Import the schema from your API route
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+
+import {
+  Command,
+  CommandList,
+  CommandGroup,
+  CommandItem,
+  CommandInput,
+  CommandEmpty,
+} from "@/components/ui/command";
+
+import { ChevronsUpDown } from "lucide-react";
+
 import { projectSchema } from "@/app/api/projects/route";
 
-// Define the form data type with explicit Date types
 type ProjectFormData = {
   title: string;
   description: string;
@@ -68,12 +84,18 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
   const skills = watch("requiredSkills");
 
-  const handleAddSkill = (e: React.KeyboardEvent<HTMLInputElement> | { key: string; preventDefault: () => void }) => {
+  const handleAddSkill = (
+    e:
+      | React.KeyboardEvent<HTMLInputElement>
+      | { key: string; preventDefault: () => void }
+  ) => {
     if ((e.key === "Enter" || e.key === ",") && skillInput.trim()) {
       e.preventDefault();
       const newSkill = skillInput.trim().replace(/,$/g, "");
       if (newSkill && !skills.includes(newSkill)) {
-        setValue("requiredSkills", [...skills, newSkill], { shouldValidate: true });
+        setValue("requiredSkills", [...skills, newSkill], {
+          shouldValidate: true,
+        });
         setSkillInput("");
       }
     }
@@ -113,15 +135,17 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className={cn(
-        "bg-card border-0 shadow-2xl",
-        "w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[85vw] lg:w-[75vw] xl:w-[65vw] max-w-3xl",
-        "h-[calc(100vh-1rem)] sm:h-auto max-h-[calc(100vh-1rem)] sm:max-h-[92vh]",
-        "overflow-hidden flex flex-col",
-        "p-4 sm:p-5 md:p-6 lg:p-7",
-        "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4 duration-300",
-        "rounded-lg sm:rounded-xl"
-      )}>
+      <DialogContent
+        className={cn(
+          "bg-card border-0 shadow-2xl",
+          "w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[85vw] lg:w-[75vw] xl:w-[65vw] max-w-3xl",
+          "h-[calc(100vh-1rem)] sm:h-auto max-h-[calc(100vh-1rem)] sm:max-h-[92vh]",
+          "overflow-hidden flex flex-col",
+          "p-4 sm:p-5 md:p-6 lg:p-7",
+          "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4 duration-300",
+          "rounded-lg sm:rounded-xl"
+        )}
+      >
         <DialogHeader className="animate-in slide-in-from-top-2 duration-500 pb-3 sm:pb-4 md:pb-5 flex-shrink-0">
           <DialogTitle className="text-foreground text-lg sm:text-xl md:text-2xl font-semibold">
             Create New Project
@@ -129,10 +153,16 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
         </DialogHeader>
 
         <div className="overflow-y-auto flex-1 -mx-4 sm:-mx-5 md:-mx-6 lg:-mx-7 px-4 sm:px-5 md:px-6 lg:px-7">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 md:space-y-5 pb-2">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-3 sm:space-y-4 md:space-y-5 pb-2"
+          >
             {/* Title */}
             <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-75">
-              <Label htmlFor="title" className="text-foreground text-sm sm:text-base font-medium">
+              <Label
+                htmlFor="title"
+                className="text-foreground text-sm sm:text-base font-medium"
+              >
                 Project Title *
               </Label>
               <Input
@@ -155,7 +185,10 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
             {/* Description */}
             <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-100">
-              <Label htmlFor="description" className="text-foreground text-sm sm:text-base font-medium">
+              <Label
+                htmlFor="description"
+                className="text-foreground text-sm sm:text-base font-medium"
+              >
                 Description *
               </Label>
               <Textarea
@@ -178,61 +211,85 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
             </div>
 
             {/* Required Skills */}
-            <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-150">
-              <Label htmlFor="skills" className="text-foreground text-sm sm:text-base font-medium">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-sm sm:text-base font-medium">
                 Required Skills *
               </Label>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                <Input
-                  id="skills"
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  onKeyDown={handleAddSkill}
-                  className={cn(
-                    "border-border bg-background/50 transition-all duration-200",
-                    "text-sm sm:text-base h-9 sm:h-10 md:h-11 flex-1",
-                    "px-3 sm:px-4",
-                    "focus:ring-2 focus:ring-ring focus:ring-offset-1",
-                    errors.requiredSkills && "border-destructive animate-shake"
-                  )}
-                  placeholder="Type and press Enter"
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => handleAddSkill({ key: "Enter", preventDefault: () => {} } as React.KeyboardEvent<HTMLInputElement>)}
-                  disabled={!skillInput.trim()}
-                  className={cn(
-                    "transition-all duration-200 hover:scale-105 active:scale-95",
-                    "h-9 sm:h-10 md:h-11 w-full sm:w-auto",
-                    "text-sm px-4 sm:px-5"
-                  )}
-                >
-                  <Plus className="w-4 h-4 sm:mr-1.5" />
-                  <span className="ml-1 sm:ml-0">Add</span>
-                </Button>
-              </div>
-              {errors.requiredSkills && (
-                <p className="text-xs sm:text-sm text-destructive animate-in slide-in-from-top-1 duration-200">
-                  {errors.requiredSkills.message}
-                </p>
-              )}
-              {skills && skills.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
-                  {skills.map((skill, index) => (
-                    <Badge 
-                      key={skill} 
-                      className={cn(
-                        "bg-secondary text-secondary-foreground animate-in zoom-in-50 duration-300",
-                        "text-xs sm:text-sm py-1 px-2 sm:px-2.5"
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    {skills.length === 0
+                      ? "Select required skills"
+                      : `${skills.length} skill(s) selected`}
+                    <ChevronsUpDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Search skills..." />
+                    <CommandEmpty>No skills found.</CommandEmpty>
+
+                    <CommandList>
+                      {Object.entries(PREDEFINED_SKILLS).map(
+                        ([category, items]) => (
+                          <CommandGroup key={category} heading={category}>
+                            {items.map((skill) => {
+                              const selected = skills.includes(skill);
+
+                              return (
+                                <CommandItem
+                                  key={skill}
+                                  onSelect={() => {
+                                    if (selected) {
+                                      handleRemoveSkill(skill);
+                                    } else {
+                                      setValue(
+                                        "requiredSkills",
+                                        [...skills, skill],
+                                        {
+                                          shouldValidate: true,
+                                        }
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <div
+                                    className={`mr-2 h-4 w-4 rounded-sm border ${
+                                      selected
+                                        ? "bg-primary border-primary"
+                                        : "border-muted"
+                                    }`}
+                                  />
+                                  {skill}
+                                </CommandItem>
+                              );
+                            })}
+                          </CommandGroup>
+                        )
                       )}
-                      style={{ animationDelay: `${index * 50}ms` }}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              {/* Selected Skill Badges */}
+              {skills.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {skills.map((skill) => (
+                    <Badge
+                      key={skill}
+                      className="bg-primary flex gap-1 items-center"
                     >
                       {skill}
                       <button
-                        type="button"
                         onClick={() => handleRemoveSkill(skill)}
-                        className="ml-1 sm:ml-1.5 hover:bg-secondary-foreground/20 rounded-full p-0.5 transition-all duration-200 hover:scale-110 hover:rotate-90"
+                        className="hover:bg-black/20 rounded-full p-1"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -245,7 +302,10 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
             {/* Dates */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 animate-in slide-in-from-left-2 duration-500 delay-200">
               <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="startDate" className="text-foreground text-sm sm:text-base font-medium">
+                <Label
+                  htmlFor="startDate"
+                  className="text-foreground text-sm sm:text-base font-medium"
+                >
                   Start Date *
                 </Label>
                 <Input
@@ -268,7 +328,10 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
               </div>
 
               <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="endDate" className="text-foreground text-sm sm:text-base font-medium">
+                <Label
+                  htmlFor="endDate"
+                  className="text-foreground text-sm sm:text-base font-medium"
+                >
                   End Date *
                 </Label>
                 <Input
@@ -293,7 +356,10 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
             {/* Status */}
             <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-300">
-              <Label htmlFor="projectStatus" className="text-foreground text-sm sm:text-base font-medium">
+              <Label
+                htmlFor="projectStatus"
+                className="text-foreground text-sm sm:text-base font-medium"
+              >
                 Project Status *
               </Label>
               <select
@@ -320,7 +386,10 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
             {/* GitHub Link */}
             <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-[350ms]">
-              <Label htmlFor="githubLink" className="text-foreground text-sm sm:text-base font-medium">
+              <Label
+                htmlFor="githubLink"
+                className="text-foreground text-sm sm:text-base font-medium"
+              >
                 GitHub Link
               </Label>
               <Input
@@ -344,7 +413,10 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
             {/* Live URL */}
             <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-[400ms]">
-              <Label htmlFor="liveUrl" className="text-foreground text-sm sm:text-base font-medium">
+              <Label
+                htmlFor="liveUrl"
+                className="text-foreground text-sm sm:text-base font-medium"
+              >
                 Live URL
               </Label>
               <Input
@@ -368,7 +440,10 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
             {/* Thumbnail URL */}
             <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-[450ms]">
-              <Label htmlFor="thumbnail" className="text-foreground text-sm sm:text-base font-medium">
+              <Label
+                htmlFor="thumbnail"
+                className="text-foreground text-sm sm:text-base font-medium"
+              >
                 Thumbnail URL
               </Label>
               <Input
@@ -393,10 +468,10 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
         </div>
 
         <DialogFooter className="mt-4 sm:mt-5 animate-in slide-in-from-bottom-2 duration-500 delay-500 flex-col sm:flex-row gap-2 sm:gap-3 flex-shrink-0 pt-4 sm:pt-5 border-t border-border/50">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={handleClose} 
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClose}
             disabled={isSubmitting}
             className={cn(
               "transition-all duration-200 hover:scale-105 active:scale-95",
@@ -406,9 +481,9 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
           >
             Cancel
           </Button>
-          <Button 
-            type="submit" 
-            disabled={isSubmitting} 
+          <Button
+            type="submit"
+            disabled={isSubmitting}
             onClick={handleSubmit(onSubmit)}
             className={cn(
               "transition-all duration-200 hover:scale-105 active:scale-95",
@@ -422,7 +497,7 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
                 Creating...
               </>
             ) : (
-              'Create Project'
+              "Create Project"
             )}
           </Button>
         </DialogFooter>
