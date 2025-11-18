@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export async function GET(
   req: Request,
-  { params }: { params: { profileId: string } }
+  { params }: { params: Promise<{ profileId: string }> }
 ) {
   try {
     const { profileId } = await params;

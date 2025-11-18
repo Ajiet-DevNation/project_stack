@@ -1,6 +1,6 @@
 import DemoOne from "@/components/ShaderBackground";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/prisma";
 import Link from "next/link";
@@ -9,11 +9,11 @@ import { ApplicationsList } from "../../_components/ApplicationsList";
 import { getProjectApplications } from "../../../../../../actions/applications";
 
 interface ApplicationsPageProps {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
 export default async function ApplicationsPage({ params }: ApplicationsPageProps) {
-    const { id } = params;
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) redirect("/login");

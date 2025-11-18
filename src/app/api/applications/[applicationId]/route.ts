@@ -1,6 +1,6 @@
 import { db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 
@@ -10,7 +10,7 @@ const updateApplicationSchema = z.object({
 
 export async function PUT(
   req: Request,
-  { params }: { params: { applicationId: string } }
+  { params }: { params: Promise<{ applicationId: string }> }
 ) {
   try {
     // 1. Authenticate the user

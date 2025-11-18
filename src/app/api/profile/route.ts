@@ -1,11 +1,11 @@
 import { db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 
 // Zod schema to validate the incoming profile data
-export const profileSchema = z.object({
+const createProfileSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   branch: z.string().min(1, "Branch is required"),
   year: z.string().min(1, "Year is required"),
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
     // 3. Validate the request body
     const body = await req.json();
-    const parsedData = profileSchema.parse(body);
+    const parsedData = createProfileSchema.parse(body);
 
     // 4. Create the profile and update the user in a single transaction
     // This ensures both actions succeed or both fail together.

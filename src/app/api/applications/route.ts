@@ -1,13 +1,10 @@
 import { db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { projectId: string } }
-) {
+export async function GET(req: Request) {
   try {
     // 1. Authenticate the user and ensure they have a profile
     const session = await getServerSession(authOptions);
@@ -21,9 +18,16 @@ export async function GET(
       return new Response("Profile not found.", { status: 403 });
     }
 
-    // 2. Await and validate the project ID from the URL
-    const { projectId } = await params;
-    const validatedProjectId = z.string().cuid("Invalid project ID").parse(projectId);
+    // 2. Validate the project ID from the query string
+    const { searchParams } = new URL(req.url);
+    const projectId = searchParams.get("projectId");
+    if (!projectId) {
+      return new Response("Project ID is required", { status: 400 });
+    }
+    const validatedProjectId = z
+      .string()
+      .cuid("Invalid project ID")
+      .parse(projectId);
 
     // 3. Authorization: Verify the user is the project's author
     const project = await db.project.findUnique({ where: { id: validatedProjectId } });
