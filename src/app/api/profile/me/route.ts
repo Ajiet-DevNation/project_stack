@@ -1,6 +1,6 @@
 import { db } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { authOptions } from "@/lib/authOptions"
 import { z } from "zod"
 
 // This allows partial updates without strict field requirements

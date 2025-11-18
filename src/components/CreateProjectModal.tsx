@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, Loader2, Plus } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import {
@@ -38,7 +38,7 @@ import {
 
 import { ChevronsUpDown } from "lucide-react";
 
-import { projectSchema } from "@/app/api/projects/route";
+import { projectSchema } from "@/lib/validations/project";
 
 type ProjectFormData = {
   title: string;
@@ -58,7 +58,6 @@ interface CreateProjectModalProps {
 }
 
 export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
-  const [skillInput, setSkillInput] = React.useState("");
 
   const {
     register,
@@ -83,23 +82,6 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
   });
 
   const skills = watch("requiredSkills");
-
-  const handleAddSkill = (
-    e:
-      | React.KeyboardEvent<HTMLInputElement>
-      | { key: string; preventDefault: () => void }
-  ) => {
-    if ((e.key === "Enter" || e.key === ",") && skillInput.trim()) {
-      e.preventDefault();
-      const newSkill = skillInput.trim().replace(/,$/g, "");
-      if (newSkill && !skills.includes(newSkill)) {
-        setValue("requiredSkills", [...skills, newSkill], {
-          shouldValidate: true,
-        });
-        setSkillInput("");
-      }
-    }
-  };
 
   const handleRemoveSkill = (skillToRemove: string) => {
     const updatedSkills = skills.filter((skill) => skill !== skillToRemove);
@@ -129,7 +111,6 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
   const handleClose = () => {
     reset();
-    setSkillInput("");
     onClose();
   };
 

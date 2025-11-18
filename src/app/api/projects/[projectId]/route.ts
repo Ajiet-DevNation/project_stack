@@ -1,15 +1,15 @@
 import { db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { z } from "zod";
-import { projectSchema } from "../route";
+import { projectSchema } from "@/lib/validations/project";
 import { NextRequest, NextResponse } from "next/server";
 const updateProjectSchema = projectSchema.partial();
 import { createNotification } from "../../../../../actions/notifications";
 
 export async function GET(
   req: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const { projectId } = await params;
@@ -55,7 +55,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -93,7 +93,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);

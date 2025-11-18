@@ -3,13 +3,13 @@ import { ExternalLink, Github, Calendar, Users } from "lucide-react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { checkApplicationStatus } from "../../../../../actions/applications";
+import { checkApplicationStatus } from "../../../../../../actions/applications";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { db } from "@/lib/prisma";
-import { ApplyButton } from "../_components/ApplyButton";
+import { ApplyButton } from "../../../projects/_components/ApplyButton";
 import LikeButton from "@/components/LikeButton";
-import { SettingsDropdown } from "./_components/SettingsDropdown";
+import { SettingsDropdown } from "../../../projects/[id]/_components/SettingsDropdown";
 import { UserRoundCog } from "lucide-react";
 
 interface ProjectPageProps {

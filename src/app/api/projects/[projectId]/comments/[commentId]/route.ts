@@ -1,12 +1,12 @@
 import { db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { z } from "zod";
 
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { commentId: string } }
+    req: Request,
+    { params }: { params: Promise<{ commentId: string }> }
 ) {
   try {
     // 1. Authenticate the user

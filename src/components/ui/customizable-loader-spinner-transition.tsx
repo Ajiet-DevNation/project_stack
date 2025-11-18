@@ -1,6 +1,12 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
+
+type AnimatedSquareStyle = React.CSSProperties & {
+  "--delay": string;
+  "--speed": number;
+  "--play-state": "paused" | "running";
+};
 
 export const Component = () => {
   const [mounted, setMounted] = useState(false);
@@ -181,33 +187,36 @@ export const Component = () => {
         height: '100%'
       }}>
         <div style={{ position: 'relative' }}>
-          {squares.map((square) => (
-            <div
-              key={square.id}
-              className="nested-square"
-              style={{
-                position: 'absolute',
-                boxSizing: 'content-box',
-                padding: `${square.padding}px`,
-                top: `${square.offset}px`,
-                left: `${square.offset}px`,
-                border: `1px solid ${square.color}`,
-                boxShadow: `0 0 3px ${square.color}, inset 0 0 3px rgba(255, 255, 255, 0.1)`,
-                borderRadius: '2px',
-                '--delay': `${square.delay}s`,
-                '--speed': speed,
-                '--play-state': isPaused ? 'paused' : 'running',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#ffffff';
-                e.currentTarget.style.boxShadow = '0 0 10px #ffffff, inset 0 0 5px rgba(255, 255, 255, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = square.color;
-                e.currentTarget.style.boxShadow = `0 0 3px ${square.color}, inset 0 0 3px rgba(255, 255, 255, 0.1)`;
-              }}
-            />
-          ))}
+          {squares.map((square) => {
+            const squareStyle: AnimatedSquareStyle = {
+              position: 'absolute',
+              boxSizing: 'content-box',
+              padding: `${square.padding}px`,
+              top: `${square.offset}px`,
+              left: `${square.offset}px`,
+              border: `1px solid ${square.color}`,
+              boxShadow: `0 0 3px ${square.color}, inset 0 0 3px rgba(255, 255, 255, 0.1)`,
+              borderRadius: '2px',
+              '--delay': `${square.delay}s`,
+              '--speed': speed,
+              '--play-state': isPaused ? 'paused' : 'running',
+            };
+            return (
+              <div
+                key={square.id}
+                className="nested-square"
+                style={squareStyle}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#ffffff';
+                  e.currentTarget.style.boxShadow = '0 0 10px #ffffff, inset 0 0 5px rgba(255, 255, 255, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = square.color;
+                  e.currentTarget.style.boxShadow = `0 0 3px ${square.color}, inset 0 0 3px rgba(255, 255, 255, 0.1)`;
+                }}
+              />
+            );
+          })}
         </div>
       </div>
 
