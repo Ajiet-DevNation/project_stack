@@ -5,6 +5,7 @@ import { useForm, SubmitHandler, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { PREDEFINED_SKILLS } from "@/lib/skills";
+import { ImageUpload } from "./ui/imageUpload";
 
 import {
   Dialog,
@@ -421,23 +422,12 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
             {/* Thumbnail URL */}
             <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-[450ms]">
-              <Label
-                htmlFor="thumbnail"
-                className="text-foreground text-sm sm:text-base font-medium"
-              >
-                Thumbnail URL
-              </Label>
-              <Input
-                id="thumbnail"
-                {...register("thumbnail")}
-                placeholder="https://example.com/image.jpg"
-                className={cn(
-                  "border-border bg-background/50 transition-all duration-200",
-                  "text-sm sm:text-base h-9 sm:h-10 md:h-11",
-                  "px-3 sm:px-4",
-                  "focus:ring-2 focus:ring-ring focus:ring-offset-1",
-                  errors.thumbnail && "border-destructive animate-shake"
-                )}
+              <ImageUpload 
+                label="Project Thumbnail"
+                value={watch("thumbnail") || ""} 
+                onChange={(url) => {
+                  setValue("thumbnail", url, { shouldValidate: true });
+                }} 
               />
               {errors.thumbnail && (
                 <p className="text-xs sm:text-sm text-destructive animate-in slide-in-from-top-1 duration-200">
