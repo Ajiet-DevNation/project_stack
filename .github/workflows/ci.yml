@@ -1,52 +1,68 @@
 name: Next.js + Prisma CI
 
 on: 
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs: 
-    ci:
-        runs-on: ubuntu-latest
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          
-        strategy:
-            matrix:
-                node-version: [22]
+  ci:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v4
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                node-version: ${{ matrix['node-version'] }}
+      # Auth / NextAuth
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
-            - name: Cache node_modules
-              uses: actions/cache@v4
-              with: 
-                path: ~/.npm
-                key: ${{runner.os}}-node-${{ hashFiles('**/package-lock.json')}}
-                restore-keys: |
-                    ${{runner.os}}-node-
+      # GitHub OAuth
+      AUTH_GITHUB_SECRET: ${{ secrets.AUTH_GITHUB_SECRET }}
 
-            - name: Install Dependencies
-              run: npm ci
+      # Google OAuth
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
-            - name: Generate Prisma client
-              run: npx prisma generate
+      # Supabase
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
-            - name: Run migrations (optional)
-              run: npx prisma migrate deploy
+    strategy:
+      matrix:
+        node-version: [22]
 
-            - name: Run ESLint
-              run: npm run lint
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-            - name: Build
-              run: npm run build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix['node-version'] }}
 
-            - name: Run tests
-              run: npm test
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with: 
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run migrations (optional)
+        run: npx prisma migrate deploy
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
