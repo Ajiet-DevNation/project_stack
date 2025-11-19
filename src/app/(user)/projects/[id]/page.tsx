@@ -56,7 +56,8 @@ interface ApiProject {
 async function getProject(id: string): Promise<ApiProject | null> {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
       }/api/projects/${id}`,
       {
         cache: "no-store",
@@ -168,10 +169,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     <Image
                       src={project.image}
                       alt={project.title}
-                      width={800}
-                      height={500}
-                      className="w-full object-cover"
-                      style={{ height: "500px" }}
+                      width={1920}
+                      height={1080}
+                      className="w-full aspect-video object-contain"
                     />
                   </div>
 
@@ -214,11 +214,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                         Start Date
                       </p>
                       <p className="text-base font-semibold text-foreground">
-                        {new Date(project.startDate).toLocaleDateString("en-US", {
-                          month: "long",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        {new Date(project.startDate).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
                       </p>
                     </div>
                   </div>
@@ -233,11 +236,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                           Expected End
                         </p>
                         <p className="text-base font-semibold text-foreground">
-                          {new Date(project.endDate).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                          {new Date(project.endDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                            }
+                          )}
                         </p>
                       </div>
                     </div>
@@ -326,12 +332,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <div className="p-6 border-b border-border/50">
                     <div className="flex items-center justify-between mb-4">
                       <span
-                        className={`px-3 py-1.5 rounded-full text-xs font-semibold ${project.status === "Completed"
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
+                          project.status === "Completed"
                             ? "bg-green-500/10 text-green-600 dark:text-green-400"
                             : project.status === "Active"
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
-                          }`}
+                            ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                            : "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
+                        }`}
                       >
                         {project.status}
                       </span>
@@ -358,7 +365,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                             alt={project.creator.name}
                             width={48}
                             height={48}
-                            className="h-12 w-12 rounded-full border-2 border-border hover:border-primary/50 transition-colors"
+                            className="h-12 w-12 rounded-full border-2 border-border hover:border-primary/50 transition-colors object-contain"
                           />
                         ) : (
                           <div className="h-12 w-12 rounded-full bg-muted border-2 border-border hover:border-primary/50 transition-colors flex items-center justify-center text-foreground font-semibold">
@@ -423,7 +430,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                           projectId={project.id}
                           profileId={currentUserProfile.id}
                           hasApplied={applicationStatus?.hasApplied}
-                          applicationStatus={applicationStatus?.applicationStatus}
+                          applicationStatus={
+                            applicationStatus?.applicationStatus
+                          }
                           isContributor={applicationStatus?.isContributor}
                         />
                       )

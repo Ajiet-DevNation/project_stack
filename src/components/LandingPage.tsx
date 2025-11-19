@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Sparkles, Users, Lightbulb, ArrowRight } from "lucide-react";
-import { useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
 import FAQSection from "./FAQSection";
 import SpiralAnimation from "./SpiralAnimation";
 
@@ -14,9 +12,7 @@ export default function LandingPage({
   onGetStarted,
   onExploreProjects,
 }: LandingPageProps) {
-  // const router = useRouter();
   const [activeWord, setActiveWord] = useState(0);
-  const { data: session } = useSession();
   const words = ["Collaborate", "Create", "Build", "Innovate"];
 
   useEffect(() => {
@@ -24,7 +20,7 @@ export default function LandingPage({
       setActiveWord((prev) => (prev + 1) % words.length);
     }, 2000);
     return () => clearInterval(interval);
-  }, [words.length, session]);
+  }, [words.length]);
 
   return (
     <div className="min-h-screen text-foreground pt-40 relative overflow-x-hidden">
