@@ -1,4 +1,4 @@
-name: Next.js + Prisma CI/CD 
+name: Next.js + Prisma CI
 
 on: 
     push:
@@ -7,19 +7,18 @@ on:
         branches: [main]
 
 jobs: 
-    build-and-deploy:
-        runs-on: ${{ matrix.os }}
+    ci:
+        runs-on: ubuntu-latest
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           
         strategy:
             matrix:
-                os: [ubuntu-latest, windows-latest]
                 node-version: [22]
 
         steps:
             - name: Checkout repo
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
@@ -45,3 +44,9 @@ jobs:
 
             - name: Run ESLint
               run: npm run lint
+
+            - name: Build
+              run: npm run build
+
+            - name: Run tests
+              run: npm test
