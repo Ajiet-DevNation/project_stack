@@ -27,6 +27,7 @@ export default withAuth(
       return NextResponse.redirect(new URL("/", req.url));
     }
 
+    
     // Case 2: Authenticated but not onboarded
     if (isAuthenticated && !isOnboarded) {
       // Allow access to onboarding page
@@ -48,7 +49,7 @@ export default withAuth(
         return NextResponse.redirect(new URL("/home", req.url));
       }
       // Redirect from landing page to home if already authenticated and onboarded
-      if (isPublicRoute) {
+      if (pathname === "/") {
         return NextResponse.redirect(new URL("/home", req.url));
       }
       // Allow access to all other routes

@@ -19,14 +19,15 @@ export default function Home() {
     }
   };
 
+  const handleExploreProjects = () => {
+    router.push("/home");
+  };
+
   return (
     <>
       <LandingPage
         onGetStarted={handleGetStarted}
-        onExploreProjects={() => {
-          router.push("/home");
-          console.log("Explore Projects clicked");
-        }}
+        onExploreProjects={handleExploreProjects}
       />
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>

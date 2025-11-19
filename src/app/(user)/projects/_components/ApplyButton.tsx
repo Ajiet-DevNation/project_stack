@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { UserPlus, Check, Clock } from 'lucide-react';
 import { applyToProject } from '../../../../../actions/applications';
+import { useSession } from 'next-auth/react';
+import { LoginModal } from '@/components/LoginModal';
 
 interface ApplyButtonProps {
     projectId: string;
@@ -23,6 +25,8 @@ export function ApplyButton({
 }: ApplyButtonProps) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const { data: session } = useSession();
+    const [loginOpen, setLoginOpen] = useState(false);
 
     const handleApply = async () => {
         setLoading(true);
@@ -40,6 +44,21 @@ export function ApplyButton({
             setLoading(false);
         }
     };
+
+    if (!session) {
+        return (
+            <>
+                <Button
+                    onClick={() => setLoginOpen(true)}
+                    className="inline-flex items-center gap-2 bg-primary hover:opacity-90 w-full transition-all shadow-md"
+                >
+                    <UserPlus className="h-4 w-4" />
+                    Login to Apply
+                </Button>
+                <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+            </>
+        );
+    }
 
     if (isContributor) {
         return (
