@@ -106,11 +106,19 @@ export function OnboardingForm() {
   };
 
   const onSubmit = async (data: FormValues) => {
-    console.log("[v0] Onboarding submit:", data);
-    const updatedData = await axios.post("/api/profile", data);
-    console.log(updatedData);
-    reset();
-    setCurrentStep(-1) // Return to welcome screen
+    try {
+      console.log("[v0] Onboarding submit:", data);
+      const updatedData = await axios.post("/api/profile", data);
+      console.log(updatedData);
+      
+      // Force a hard reload to update the session and redirect to home
+      // We use window.location.href instead of router.push to ensure 
+      // the session is re-fetched from the server
+      window.location.href = "/home";
+    } catch (error) {
+      console.error("Error submitting onboarding form:", error);
+      // You might want to show an error message to the user here
+    }
   }
 
   const startOnboarding = () => {

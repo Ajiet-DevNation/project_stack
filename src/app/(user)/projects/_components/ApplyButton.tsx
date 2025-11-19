@@ -10,7 +10,7 @@ import { LoginModal } from '@/components/LoginModal';
 
 interface ApplyButtonProps {
     projectId: string;
-    profileId: string;
+    profileId?: string;
     hasApplied?: boolean;
     applicationStatus?: string;
     isContributor?: boolean;
@@ -29,6 +29,11 @@ export function ApplyButton({
     const [loginOpen, setLoginOpen] = useState(false);
 
     const handleApply = async () => {
+        if (!profileId) {
+            window.location.href = "/onboarding";
+            return;
+        }
+
         setLoading(true);
         try {
             const result = await applyToProject(profileId, projectId);

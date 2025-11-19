@@ -42,6 +42,11 @@ export function ClientLayoutShell({ children }: ClientLayoutShellProps) {
 
   const handleCreateClick = () => {
     if (session) {
+      // Check if user is onboarded (profileId is set)
+      if (!profileId) {
+        window.location.href = "/onboarding";
+        return;
+      }
       setIsCreateModalOpen(true);
     } else {
       setIsLoginModalOpen(true);

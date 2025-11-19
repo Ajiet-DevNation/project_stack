@@ -424,11 +424,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                         Manage Applications
                       </Link>
                     ) : (
-                      project.isActive &&
-                      currentUserProfile && (
+                      project.isActive && (
                         <ApplyButton
                           projectId={project.id}
-                          profileId={currentUserProfile.id}
+                          profileId={currentUserProfile?.id}
                           hasApplied={applicationStatus?.hasApplied}
                           applicationStatus={
                             applicationStatus?.applicationStatus

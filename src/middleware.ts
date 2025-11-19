@@ -34,7 +34,7 @@ export default withAuth(
       if (isOnboardingRoute) {
         return NextResponse.next();
       }
-      // Allow access to landing page (in case they want to sign out)
+      // Allow access to public routes (landing page, home)
       if (isPublicRoute) {
         return NextResponse.next();
       }
