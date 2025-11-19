@@ -9,12 +9,11 @@ export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
 
-
   const [loginOpen, setLoginOpen] = useState(false);
 
   const handleGetStarted = () => {
     if (session) {
-      router.push('/home');
+      router.push("/home");
     } else {
       setLoginOpen(true);
     }
@@ -24,7 +23,10 @@ export default function Home() {
     <>
       <LandingPage
         onGetStarted={handleGetStarted}
-        onExploreProjects={() => router.push('/home')}
+        onExploreProjects={() => {
+          router.push("/home");
+          console.log("Explore Projects clicked");
+        }}
       />
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>

@@ -6,7 +6,7 @@ export default withAuth(
     const token = req.nextauth.token;
     const pathname = req.nextUrl.pathname;
     // Define public routes (accessible without auth)
-    const isPublicRoute = pathname === "/";
+    const isPublicRoute = pathname === "/" || pathname === "/home";
     
     // Define onboarding route
     const isOnboardingRoute = pathname.startsWith("/onboarding");
