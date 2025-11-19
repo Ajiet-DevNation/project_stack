@@ -11,15 +11,22 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
-import { User, GraduationCap, Building2, Calendar, MapPin, FileText, Sparkles, X, Plus, Play } from "lucide-react"
+import { User, GraduationCap, Building2, Calendar, MapPin, FileText, Sparkles, X, Play, ChevronsUpDown } from "lucide-react"
 import axios from "axios";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
+import { Command, CommandList, CommandGroup, CommandItem, CommandInput, CommandEmpty } from "@/components/ui/command"
+import { PREDEFINED_SKILLS } from "@/lib/skills"
+import { engineeringColleges } from "@/lib/college"
 
 const schema = z.object({
   name: z.string().min(2, "Please enter your full name"),
   section: z.string().min(1, "Please enter your section"),
   branch: z.string().min(2, "Please enter your branch"),
   year: z.string().min(1, "Please enter your year"),
-  college: z.string().min(2, "Please enter your college"),
+  college: z.string().refine(
+    (val) => engineeringColleges.includes(val),
+    { message: "Please select a valid college from the list." }
+  ),
   bio: z.string().min(10, "Tell us a bit more (min 10 chars)").max(300, "Max 300 characters"),
   skills: z.array(z.string().min(1)).min(1, "Add at least one skill"),
 })
@@ -44,8 +51,8 @@ const fieldIcons = {
 
 export function OnboardingForm() {
   const [currentStep, setCurrentStep] = React.useState(-1) // Start at -1 for welcome screen
-  const [skillInput, setSkillInput] = React.useState("")
   const [completedFields, setCompletedFields] = React.useState<Set<string>>(new Set())
+  const [isCollegeComboboxOpen, setIsCollegeComboboxOpen] = React.useState(false);
   
   const {
     register,
@@ -93,22 +100,10 @@ export function OnboardingForm() {
     setCompletedFields(newCompleted)
   }, [name, section, branch, year, college, bio, skills])
 
-  const addSkill = React.useCallback(
-    (raw: string) => {
-      const value = raw.trim().replace(/[,]+$/, "")
-      if (!value) return
-      if (skills.includes(value)) return
-      const next = [...skills, value]
-      setValue("skills", next, { shouldValidate: true })
-      setSkillInput("")
-    },
-    [skills, setValue],
-  )
-
-  const removeSkill = (value: string) => {
-    const next = skills.filter((s: string) => s !== value)
-    setValue("skills", next, { shouldValidate: true })
-  }
+  const handleRemoveSkill = (skillToRemove: string) => {
+    const updatedSkills = skills.filter((skill) => skill !== skillToRemove);
+    setValue("skills", updatedSkills, { shouldValidate: true });
+  };
 
   const onSubmit = async (data: FormValues) => {
     console.log("[v0] Onboarding submit:", data);
@@ -116,13 +111,6 @@ export function OnboardingForm() {
     console.log(updatedData);
     reset();
     setCurrentStep(-1) // Return to welcome screen
-  }
-
-  const onSkillKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === "Enter" || e.key === "," || e.key === "Tab") {
-      e.preventDefault()
-      addSkill(skillInput)
-    }
   }
 
   const startOnboarding = () => {
@@ -315,24 +303,67 @@ export function OnboardingForm() {
       </Label>
       
       <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Input
-            value={skillInput}
-            onChange={(e) => setSkillInput(e.target.value)}
-            onKeyDown={onSkillKeyDown}
-            placeholder="Type a skill and press Enter"
-            className="bg-background/40 backdrop-blur-sm border-border/40 text-foreground placeholder:text-muted-foreground"
-          />
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => addSkill(skillInput)}
-            disabled={!skillInput.trim()}
-            className="bg-primary/80 hover:bg-primary/90 backdrop-blur-sm"
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
+      <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    {skills.length === 0
+                      ? "Select your skills"
+                      : `${skills.length} skill(s) selected`}
+                    <ChevronsUpDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Search skills..." />
+                    <CommandEmpty>No skills found.</CommandEmpty>
+
+                    <CommandList>
+                      {Object.entries(PREDEFINED_SKILLS).map(
+                        ([category, items]) => (
+                          <CommandGroup key={category} heading={category}>
+                            {items.map((skill) => {
+                              const selected = skills.includes(skill);
+
+                              return (
+                                <CommandItem
+                                  key={skill}
+                                  onSelect={() => {
+                                    if (selected) {
+                                      handleRemoveSkill(skill);
+                                    } else {
+                                      setValue(
+                                        "skills",
+                                        [...skills, skill],
+                                        {
+                                          shouldValidate: true,
+                                        }
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <div
+                                    className={`mr-2 h-4 w-4 rounded-sm border ${
+                                      selected
+                                        ? "bg-primary border-primary"
+                                        : "border-muted"
+                                    }`}
+                                  />
+                                  {skill}
+                                </CommandItem>
+                              );
+                            })}
+                          </CommandGroup>
+                        )
+                      )}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
 
         <AnimatePresence>
           {skills.length > 0 && (
@@ -357,7 +388,7 @@ export function OnboardingForm() {
                     {skill}
                     <button
                       type="button"
-                      onClick={() => removeSkill(skill)}
+                      onClick={() => handleRemoveSkill(skill)}
                       className="ml-2 hover:text-destructive transition-colors"
                     >
                       <X className="w-3 h-3" />
@@ -368,10 +399,6 @@ export function OnboardingForm() {
             </motion.div>
           )}
         </AnimatePresence>
-
-        <p className="text-xs text-muted-foreground">
-          Add skills like React, Python, Figma, etc. Press Enter or comma to add.
-        </p>
 
         <AnimatePresence>
           {errors.skills && (
@@ -388,6 +415,87 @@ export function OnboardingForm() {
       </div>
     </motion.div>
   )
+
+  const renderCollegeField = () => {
+    const Icon = fieldIcons['college']
+    const isCompleted = completedFields.has('college')
+    const hasError = errors['college']
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-2"
+      >
+        <Label 
+          htmlFor="college" 
+          className="text-foreground font-medium flex items-center gap-2"
+        >
+          <Icon className="w-4 h-4" />
+          College
+          {isCompleted && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="w-2 h-2 bg-green-500 rounded-full"
+            />
+          )}
+        </Label>
+        
+        <Popover open={isCollegeComboboxOpen} onOpenChange={setIsCollegeComboboxOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={isCollegeComboboxOpen}
+              className={cn(
+                "w-full justify-between bg-background/40 backdrop-blur-sm border-border/40 text-foreground placeholder:text-muted-foreground transition-all duration-300 focus:bg-background/60 focus:border-primary/50",
+                hasError && "border-destructive/50 focus:border-destructive",
+                isCompleted && "border-green-500/30"
+              )}
+            >
+              {college || "Select your college"}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder="Search college..." />
+              <CommandEmpty>No college found.</CommandEmpty>
+              <CommandList>
+                <CommandGroup>
+                  {engineeringColleges.map((collegeOption) => (
+                    <CommandItem
+                      key={collegeOption}
+                      onSelect={() => {
+                        setValue("college", collegeOption, { shouldValidate: true });
+                        setIsCollegeComboboxOpen(false);
+                      }}
+                    >
+                      {collegeOption}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+
+        <AnimatePresence>
+          {hasError && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="text-xs text-destructive"
+            >
+              {hasError.message?.toString()}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    )
+  }
 
   return (
     <div className="space-y-8">
@@ -443,7 +551,7 @@ export function OnboardingForm() {
                   {renderField('branch', 'e.g., CSE / ECE / ME / CE')}
                   {renderField('year', 'e.g., 1st / 2nd / 3rd / 4th')}
                 </div>
-                {renderField('college', 'e.g., National Institute of Technology')}
+                {renderCollegeField()}
               </div>
             )}
 
