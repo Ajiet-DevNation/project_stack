@@ -8,7 +8,6 @@ import {
   Lightbulb,
   Rocket,
   CheckCircle2,
-  MessageCircle,
   Github,
 } from "lucide-react";
 
