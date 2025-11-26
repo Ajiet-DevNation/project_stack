@@ -75,7 +75,7 @@ interface ProjectCardProps extends React.HTMLAttributes<HTMLDivElement> {
   description: string;
   status: "Planning" | "Active" | "Completed";
   likes: number;
-  comments: number;
+  // comments: number;
   href: string;
   githubUrl?: string; // Optional GitHub URL
   techStack?: TechStackItem[]; // Optional tech stack array
@@ -90,7 +90,7 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
       description,
       status,
       likes,
-      comments,
+      // comments,
       href,
       githubUrl,
       techStack = [],
@@ -223,13 +223,13 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
                   </span>
                   <span className="text-muted-foreground text-sm">Likes</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-blue-400" /> {/* No 'info' color, so blue is fine */}
+                {/* <div className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-blue-400" /> 
                   <span className="text-lg font-bold text-foreground">
                     {comments}
                   </span>
                   <span className="text-muted-foreground text-sm">Comments</span>
-                </div>
+                </div> */}
               </div>
               <Button
                 asChild

@@ -17,9 +17,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { X, Plus, User, Save } from "lucide-react"
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
+import { Command, CommandList, CommandGroup, CommandItem, CommandInput, CommandEmpty } from "@/components/ui/command"
+import { X, Plus, User, Save, ChevronsUpDown } from "lucide-react"
 import axios from "axios"
 import { Profile } from "@/types/profile"
+import { engineeringColleges } from "@/lib/college"
 
 interface ProfileEditModalProps {
     isOpen: boolean
@@ -31,6 +34,7 @@ interface ProfileEditModalProps {
 export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEditModalProps) {
     const [skillInput, setSkillInput] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isCollegeComboboxOpen, setIsCollegeComboboxOpen] = useState(false)
     const submitLockRef = useRef(false)
 
     const {
@@ -201,12 +205,40 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
                         {/* College field - spans full width */}
                         <div className="md:col-span-2">
                             <Label htmlFor="college" className="text-foreground">College</Label>
-                            <Input
-                                id="college"
-                                placeholder="e.g., National Institute of Technology"
-                                {...register("college")}
-                                className="mt-1 bg-background/40 backdrop-blur-sm border-border/40"
-                            />
+                            <Popover open={isCollegeComboboxOpen} onOpenChange={setIsCollegeComboboxOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={isCollegeComboboxOpen}
+                                        className="w-full justify-between mt-1 bg-background/40 backdrop-blur-sm border-border/40"
+                                    >
+                                        <span className="truncate">{watch("college") || "Select your college"}</span>
+                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search college..." />
+                                        <CommandEmpty>No college found.</CommandEmpty>
+                                        <CommandList>
+                                            <CommandGroup>
+                                                {engineeringColleges.map((collegeOption) => (
+                                                    <CommandItem
+                                                        key={collegeOption}
+                                                        onSelect={() => {
+                                                            setValue("college", collegeOption, { shouldValidate: true });
+                                                            setIsCollegeComboboxOpen(false);
+                                                        }}
+                                                    >
+                                                        {collegeOption}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
                             {errors.college && (
                                 <p className="text-xs text-destructive mt-1">{errors.college.message}</p>
                             )}

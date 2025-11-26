@@ -462,7 +462,7 @@ export function OnboardingForm() {
                 isCompleted && "border-green-500/30"
               )}
             >
-              {college || "Select your college"}
+              <span className="truncate">{college || "Select your college"}</span>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
