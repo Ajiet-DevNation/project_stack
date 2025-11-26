@@ -151,7 +151,7 @@ export default function ProjectCard() {
           {/* End of list message */}
           {!hasMore && projects.length > 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              You've reached the end of the list
+              You&apos;ve reached the end of the list
             </div>
           )}
         </div>
