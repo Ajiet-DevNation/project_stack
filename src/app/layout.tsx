@@ -25,11 +25,7 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   creator: "Project Stack Team",
   publisher: "Project Stack",
-  metadataBase: new URL("https://projectstack-dev.vercel.app"), 
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png", 
-  },
+  metadataBase: new URL("https://projectstack-dev.vercel.app"),
   openGraph: {
     title: "Project Stack",
     description: "Collaborate on projects seamlessly with Project Stack.",
