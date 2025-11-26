@@ -32,6 +32,13 @@ const StatusBadge = ({
       border: "border-green-400/50",
       textColor: "text-green-300",
     },
+    "In-Progress": {
+      icon: Rocket,
+      color: "text-green-400",
+      bg: "bg-green-500/20",
+      border: "border-green-400/50",
+      textColor: "text-green-300",
+    },
     Completed: {
       icon: CheckCircle2,
       color: "text-purple-400",
@@ -41,7 +48,7 @@ const StatusBadge = ({
     },
   };
 
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig.Active; // Fallback to Active if status is invalid
   const Icon = config.icon;
 
   return (
@@ -101,6 +108,7 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
     const borderColors = {
       Planning: "border-blue-400/50",
       Active: "border-green-400/50",
+      "In-Progress": "border-green-400/50",
       Completed: "border-purple-400/50",
     };
 
