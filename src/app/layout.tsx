@@ -66,6 +66,8 @@ export const metadata: Metadata = {
   },
 };
 
+// Updated favicon configuration
+
 
 
 export default function RootLayout({
