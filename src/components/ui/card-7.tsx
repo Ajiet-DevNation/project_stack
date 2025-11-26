@@ -174,7 +174,7 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
                 TECH STACK
               </h4>
               <div className="flex flex-wrap gap-3">
-                {techStack.map((tech, index) => (
+                {techStack.filter(tech => tech && tech.name).map((tech, index) => (
                   <div
                     key={index}
                     className={cn(
@@ -192,7 +192,7 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
                         "transition-colors"
                       )}
                     >
-                      {tech.icon}
+                      {tech?.icon || null}
                     </div>
                     <span
                       className={cn(
