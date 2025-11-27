@@ -10,14 +10,13 @@ export default async function ProfilePage() {
     redirect("/")
   }
 
-  // Fetch the profile ID from the user ID
   const profile = await db.profile.findUnique({
     where: { userId: session.user.id },
     select: { id: true }
   });
 
   if (!profile) {
-    redirect("/onboarding") // Redirect if no profile exists
+    redirect("/onboarding") 
   }
 
   return <ProfilePageWrapper profileId={profile.id} />

@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useSession } from "next-auth/react"
 import { profileSchema, ProfileFormData } from "@/lib/validations/profile"
 import {
     Dialog,
@@ -19,10 +20,12 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Command, CommandList, CommandGroup, CommandItem, CommandInput, CommandEmpty } from "@/components/ui/command"
-import { X, Plus, User, Save, ChevronsUpDown } from "lucide-react"
+import { X, Save, ChevronsUpDown, Info, Check } from "lucide-react"
 import axios from "axios"
 import { Profile } from "@/types/profile"
 import { engineeringColleges } from "@/lib/college"
+import { PREDEFINED_SKILLS } from "@/lib/skills"
+import { cn } from "@/lib/utils"
 
 interface ProfileEditModalProps {
     isOpen: boolean
@@ -32,10 +35,10 @@ interface ProfileEditModalProps {
 }
 
 export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEditModalProps) {
-    const [skillInput, setSkillInput] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isCollegeComboboxOpen, setIsCollegeComboboxOpen] = useState(false)
     const submitLockRef = useRef(false)
+    const { data: session } = useSession()
 
     const {
         register,
@@ -48,7 +51,6 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
         resolver: zodResolver(profileSchema),
     })
 
-    // Use an effect to reset the form when the profile data changes
     useEffect(() => {
         if (profile) {
             reset({
@@ -64,18 +66,11 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
         }
     }, [profile, reset]);
 
-
     const skills = watch("skills") || []
+    
+    const displayImage = session?.user?.image || watch("image") || undefined
 
-    const addSkill = (skillToAdd: string) => {
-        const trimmedSkill = skillToAdd.trim()
-        if (!trimmedSkill || skills.includes(trimmedSkill)) return
-
-        setValue("skills", [...skills, trimmedSkill], { shouldValidate: true })
-        setSkillInput("")
-    }
-
-    const removeSkill = (skillToRemove: string) => {
+    const handleRemoveSkill = (skillToRemove: string) => {
         setValue("skills", skills.filter(skill => skill !== skillToRemove), { shouldValidate: true })
     }
 
@@ -110,257 +105,328 @@ export function ProfileEditModal({ isOpen, onClose, profile, onSave }: ProfileEd
         }
     }
 
-    const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter" || e.key === "," || e.key === "Tab") {
-            e.preventDefault()
-            addSkill(skillInput)
-        }
-    }
-
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-sm border-border/20">
-                <DialogHeader>
-                    <DialogTitle className="text-foreground flex items-center gap-2">
-                        <User className="w-5 h-5" />
+            <DialogContent className={cn(
+                "bg-card border-0 shadow-2xl",
+                "w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[85vw] lg:w-[75vw] xl:w-[65vw] max-w-3xl",
+                "h-[calc(100vh-1rem)] sm:h-auto max-h-[calc(100vh-1rem)] sm:max-h-[92vh]",
+                "overflow-hidden flex flex-col",
+                "p-4 sm:p-5 md:p-6 lg:p-7",
+                "rounded-lg sm:rounded-xl"
+            )}>
+                <DialogHeader className="pb-3 sm:pb-4 md:pb-5 flex-shrink-0">
+                    <DialogTitle className="text-foreground text-lg sm:text-xl md:text-2xl font-semibold">
                         Edit Profile
                     </DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    {/* Profile Image */}
-                    <div className="flex items-center gap-4">
-                        <Avatar className="w-20 h-20 border-2 border-primary/20">
-                            <AvatarImage src={watch("image") ?? undefined} alt={watch("name")} />
-                            <AvatarFallback className="text-lg bg-primary/10">
-                                {watch("name")?.split(' ').map(n => n[0]).join('') || 'U'}
-                            </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                            <Label htmlFor="image" className="text-foreground">Profile Image URL</Label>
-                            <Input
-                                id="image"
-                                placeholder="https://example.com/image.jpg"
-                                {...register("image")}
-                                className="mt-1 bg-background/40 backdrop-blur-sm border-border/40"
-                            />
-                            {errors.image && (
-                                <p className="text-xs text-destructive mt-1">{errors.image.message}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="name" className="text-foreground">Full Name</Label>
-                            <Input
-                                id="name"
-                                {...register("name")}
-                                className="mt-1 bg-background/40 backdrop-blur-sm border-border/40"
-                            />
-                            {errors.name && (
-                                <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
-                            )}
-                        </div>
-
-                        <div>
-                            <Label htmlFor="section" className="text-foreground">Section</Label>
-                            <Input
-                                id="section"
-                                placeholder="A, B, C..."
-                                {...register("section")}
-                                className="mt-1 bg-background/40 backdrop-blur-sm border-border/40"
-                            />
-                            {errors.section && (
-                                <p className="text-xs text-destructive mt-1">{errors.section.message}</p>
+                <div className="overflow-y-auto flex-1 -mx-4 sm:-mx-5 md:-mx-6 lg:-mx-7 px-4 sm:px-5 md:px-6 lg:px-7">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 md:space-y-5 pb-2">
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-4">
+                                <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-primary/20">
+                                    <AvatarImage src={displayImage} alt={watch("name")} />
+                                    <AvatarFallback className="text-base sm:text-lg bg-primary/10">
+                                        {watch("name")?.split(' ').map(n => n[0]).join('') || 'U'}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <Label htmlFor="image" className="text-foreground text-sm sm:text-base">
+                                        Custom Profile Image URL (Optional)
+                                    </Label>
+                                    <Input
+                                        id="image"
+                                        placeholder="https://example.com/image.jpg"
+                                        {...register("image")}
+                                        className={cn(
+                                            "mt-1 bg-background/40 backdrop-blur-sm border-border/40",
+                                            "text-sm sm:text-base h-9 sm:h-10",
+                                            errors.image && "border-destructive"
+                                        )}
+                                    />
+                                    {errors.image && (
+                                        <p className="text-xs text-destructive mt-1">{errors.image.message}</p>
+                                    )}
+                                </div>
+                            </div>
+                            {session?.user?.image && (
+                                <div className="flex items-start gap-2 p-3 bg-primary/5 border border-primary/20 rounded-md">
+                                    <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                                    <p className="text-xs text-muted-foreground">
+                                        Your OAuth provider image is being used. Add a custom URL above to override it.
+                                    </p>
+                                </div>
                             )}
                         </div>
 
-                        <div>
-                            <Label htmlFor="branch" className="text-foreground">Branch</Label>
-                            <Input
-                                id="branch"
-                                placeholder="Computer Science Engineering"
-                                {...register("branch")}
-                                className="mt-1 bg-background/40 backdrop-blur-sm border-border/40"
-                            />
-                            {errors.branch && (
-                                <p className="text-xs text-destructive mt-1">{errors.branch.message}</p>
-                            )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <Label htmlFor="name" className="text-foreground text-sm sm:text-base">Full Name</Label>
+                                <Input
+                                    id="name"
+                                    {...register("name")}
+                                    className={cn(
+                                        "bg-background/40 backdrop-blur-sm border-border/40",
+                                        "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                                        errors.name && "border-destructive"
+                                    )}
+                                />
+                                {errors.name && (
+                                    <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <Label htmlFor="section" className="text-foreground text-sm sm:text-base">Section</Label>
+                                <Input
+                                    id="section"
+                                    placeholder="A, B, C..."
+                                    {...register("section")}
+                                    className={cn(
+                                        "bg-background/40 backdrop-blur-sm border-border/40",
+                                        "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                                        errors.section && "border-destructive"
+                                    )}
+                                />
+                                {errors.section && (
+                                    <p className="text-xs text-destructive mt-1">{errors.section.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <Label htmlFor="branch" className="text-foreground text-sm sm:text-base">Branch</Label>
+                                <Input
+                                    id="branch"
+                                    placeholder="Computer Science Engineering"
+                                    {...register("branch")}
+                                    className={cn(
+                                        "bg-background/40 backdrop-blur-sm border-border/40",
+                                        "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                                        errors.branch && "border-destructive"
+                                    )}
+                                />
+                                {errors.branch && (
+                                    <p className="text-xs text-destructive mt-1">{errors.branch.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <Label htmlFor="year" className="text-foreground text-sm sm:text-base">Year</Label>
+                                <Input
+                                    id="year"
+                                    placeholder="1st Year, 2nd Year..."
+                                    {...register("year")}
+                                    className={cn(
+                                        "bg-background/40 backdrop-blur-sm border-border/40",
+                                        "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                                        errors.year && "border-destructive"
+                                    )}
+                                />
+                                {errors.year && (
+                                    <p className="text-xs text-destructive mt-1">{errors.year.message}</p>
+                                )}
+                            </div>
+
+                            <div className="md:col-span-2 space-y-1.5 sm:space-y-2">
+                                <Label htmlFor="college" className="text-foreground text-sm sm:text-base">College</Label>
+                                <Popover open={isCollegeComboboxOpen} onOpenChange={setIsCollegeComboboxOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            aria-expanded={isCollegeComboboxOpen}
+                                            className={cn(
+                                                "w-full justify-between bg-background/40 backdrop-blur-sm border-border/40",
+                                                "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                                                errors.college && "border-destructive"
+                                            )}
+                                        >
+                                            <span className="truncate">{watch("college") || "Select your college"}</span>
+                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0" align="start">
+                                        <Command>
+                                            <CommandInput placeholder="Search college..." />
+                                            <CommandEmpty>No college found.</CommandEmpty>
+                                            <CommandList>
+                                                <CommandGroup>
+                                                    {engineeringColleges.map((collegeOption) => (
+                                                        <CommandItem
+                                                            key={collegeOption}
+                                                            onSelect={() => {
+                                                                setValue("college", collegeOption, { shouldValidate: true });
+                                                                setIsCollegeComboboxOpen(false);
+                                                            }}
+                                                        >
+                                                            {collegeOption}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                                {errors.college && (
+                                    <p className="text-xs text-destructive mt-1">{errors.college.message}</p>
+                                )}
+                            </div>
                         </div>
 
-                        <div>
-                            <Label htmlFor="year" className="text-foreground">Year</Label>
-                            <Input
-                                id="year"
-                                placeholder="1st Year, 2nd Year..."
-                                {...register("year")}
-                                className="mt-1 bg-background/40 backdrop-blur-sm border-border/40"
+                        <div className="space-y-1.5 sm:space-y-2">
+                            <Label htmlFor="bio" className="text-foreground text-sm sm:text-base">Bio</Label>
+                            <Textarea
+                                id="bio"
+                                placeholder="Tell us about yourself, your interests, and what you're looking for..."
+                                rows={4}
+                                {...register("bio")}
+                                className={cn(
+                                    "bg-background/40 backdrop-blur-sm border-border/40 resize-none",
+                                    "text-sm sm:text-base",
+                                    errors.bio && "border-destructive"
+                                )}
                             />
-                            {errors.year && (
-                                <p className="text-xs text-destructive mt-1">{errors.year.message}</p>
-                            )}
+                            <div className="flex justify-between items-center mt-1">
+                                {errors.bio && (
+                                    <p className="text-xs text-destructive">{errors.bio.message}</p>
+                                )}
+                                <p className="text-xs text-muted-foreground ml-auto">
+                                    {watch("bio")?.length || 0}/300
+                                </p>
+                            </div>
                         </div>
 
-                        {/* College field - spans full width */}
-                        <div className="md:col-span-2">
-                            <Label htmlFor="college" className="text-foreground">College</Label>
-                            <Popover open={isCollegeComboboxOpen} onOpenChange={setIsCollegeComboboxOpen}>
+                        <div className="space-y-1.5 sm:space-y-2">
+                            <Label className="text-foreground text-sm sm:text-base">Skills</Label>
+                            
+                            <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
+                                        type="button"
                                         variant="outline"
                                         role="combobox"
-                                        aria-expanded={isCollegeComboboxOpen}
-                                        className="w-full justify-between mt-1 bg-background/40 backdrop-blur-sm border-border/40"
+                                        className={cn(
+                                            "w-full justify-between bg-background/40 backdrop-blur-sm border-border/40 cursor-pointer",
+                                            "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                                            errors.skills && "border-destructive"
+                                        )}
                                     >
-                                        <span className="truncate">{watch("college") || "Select your college"}</span>
+                                        <span className="truncate">
+                                            {skills.length === 0 ? "Select your skills" : `${skills.length} skill(s) selected`}
+                                        </span>
                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-full p-0">
+
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
                                     <Command>
-                                        <CommandInput placeholder="Search college..." />
-                                        <CommandEmpty>No college found.</CommandEmpty>
-                                        <CommandList>
-                                            <CommandGroup>
-                                                {engineeringColleges.map((collegeOption) => (
-                                                    <CommandItem
-                                                        key={collegeOption}
-                                                        onSelect={() => {
-                                                            setValue("college", collegeOption, { shouldValidate: true });
-                                                            setIsCollegeComboboxOpen(false);
-                                                        }}
-                                                    >
-                                                        {collegeOption}
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
+                                        <CommandInput placeholder="Search skills..." className="h-9" />
+                                        <CommandEmpty>No skills found.</CommandEmpty>
+
+                                        <CommandList className="max-h-[300px] overflow-y-auto">
+                                            {Object.entries(PREDEFINED_SKILLS).map(([category, items]) => (
+                                                <CommandGroup key={category} heading={category}>
+                                                    {items.map((skill) => {
+                                                        const selected = skills.includes(skill);
+                                                        return (
+                                                            <CommandItem
+                                                                key={skill}
+                                                                onSelect={() => {
+                                                                    if (selected) {
+                                                                        handleRemoveSkill(skill);
+                                                                    } else {
+                                                                        setValue("skills", [...skills, skill], { shouldValidate: true });
+                                                                    }
+                                                                }}
+                                                                className="cursor-pointer"
+                                                            >
+                                                                <div className={cn(
+                                                                    "mr-2 h-4 w-4 rounded-sm border flex items-center justify-center",
+                                                                    selected ? "bg-primary border-primary" : "border-muted"
+                                                                )}>
+                                                                    {selected && (
+                                                                        <Check className="h-3 w-3 text-primary-foreground" />
+                                                                    )}
+                                                                </div>
+                                                                {skill}
+                                                            </CommandItem>
+                                                        );
+                                                    })}
+                                                </CommandGroup>
+                                            ))}
                                         </CommandList>
                                     </Command>
                                 </PopoverContent>
                             </Popover>
-                            {errors.college && (
-                                <p className="text-xs text-destructive mt-1">{errors.college.message}</p>
-                            )}
-                        </div>
-                    </div>
 
-                    {/* Bio */}
-                    <div>
-                        <Label htmlFor="bio" className="text-foreground">Bio</Label>
-                        <Textarea
-                            id="bio"
-                            placeholder="Tell us about yourself, your interests, and what you're looking for..."
-                            rows={4}
-                            {...register("bio")}
-                            className="mt-1 bg-background/40 backdrop-blur-sm border-border/40 resize-none"
-                        />
-                        <div className="flex justify-between items-center mt-1">
-                            {errors.bio && (
-                                <p className="text-xs text-destructive">{errors.bio.message}</p>
-                            )}
-                            <p className="text-xs text-muted-foreground ml-auto">
-                                {watch("bio")?.length || 0}/300
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Skills */}
-                    <div>
-                        <Label htmlFor="skills" className="text-foreground">Skills</Label>
-                        <div className="mt-2 space-y-3">
-                            <div className="flex gap-2">
-                                <Input
-                                    value={skillInput}
-                                    onChange={(e) => setSkillInput(e.target.value)}
-                                    onKeyDown={handleSkillKeyDown}
-                                    placeholder="Add a skill and press Enter"
-                                    className="bg-background/40 backdrop-blur-sm border-border/40"
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={() => addSkill(skillInput)}
-                                    disabled={!skillInput.trim()}
-                                    className="bg-primary/80 hover:bg-primary/90"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                </Button>
-                            </div>
-
-                            <AnimatePresence>
-                                {skills.length > 0 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: "auto" }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        className="flex flex-wrap gap-2"
-                                    >
-                                        {skills.map((skill, index) => (
-                                            <motion.div
-                                                key={skill}
-                                                initial={{ opacity: 0, scale: 0 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0 }}
-                                                transition={{ delay: index * 0.05 }}
+                            {skills.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {skills.map((skill) => (
+                                        <Badge
+                                            key={skill}
+                                            variant="secondary"
+                                            className="bg-primary/20 text-foreground border border-border/20 backdrop-blur-sm flex items-center gap-1"
+                                        >
+                                            {skill}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveSkill(skill)}
+                                                className="ml-1 hover:text-destructive transition-colors hover:bg-black/20 rounded-full p-0.5"
                                             >
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="bg-primary/20 text-foreground border border-border/20 backdrop-blur-sm"
-                                                >
-                                                    {skill}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeSkill(skill)}
-                                                        className="ml-2 hover:text-destructive transition-colors"
-                                                    >
-                                                        <X className="w-3 h-3" />
-                                                    </button>
-                                                </Badge>
-                                            </motion.div>
-                                        ))}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            <p className="text-xs text-muted-foreground">
-                                Add skills like React, Python, Figma, etc. Press Enter or comma to add.
-                            </p>
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </Badge>
+                                    ))}
+                                </div>
+                            )}
 
                             {errors.skills && (
                                 <p className="text-xs text-destructive">{errors.skills.message}</p>
                             )}
                         </div>
-                    </div>
+                    </form>
+                </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-border/20">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={onClose}
-                            disabled={isSubmitting}
-                            className="bg-background/20 border-border/30"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="bg-primary/80 hover:bg-primary/90 backdrop-blur-sm"
-                        >
-                            {isSubmitting ? (
+                <div className="flex flex-col sm:flex-row items-center justify-end gap-2 sm:gap-3 pt-4 sm:pt-5 border-t border-border/20 flex-shrink-0 mt-4 sm:mt-5">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onClose}
+                        disabled={isSubmitting}
+                        className={cn(
+                            "bg-background/20 border-border/30 w-full sm:w-auto order-2 sm:order-1 cursor-pointer",
+                            "h-9 sm:h-10 md:h-11 text-sm sm:text-base"
+                        )}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        onClick={handleSubmit(onSubmit)}
+                        className={cn(
+                            "bg-primary/80 hover:bg-primary/90 backdrop-blur-sm w-full sm:w-auto order-1 sm:order-2 cursor-pointer",
+                            "h-9 sm:h-10 md:h-11 text-sm sm:text-base"
+                        )}
+                    >
+                        {isSubmitting ? (
+                            <>
                                 <motion.div
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                     className="w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2"
                                 />
-                            ) : (
+                                Saving...
+                            </>
+                        ) : (
+                            <>
                                 <Save className="w-4 h-4 mr-2" />
-                            )}
-                            {isSubmitting ? "Saving..." : "Save Changes"}
-                        </Button>
-                    </div>
-                </form>
+                                Save Changes
+                            </>
+                        )}
+                    </Button>
+                </div>
             </DialogContent>
         </Dialog>
     )
