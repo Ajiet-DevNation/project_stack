@@ -125,7 +125,7 @@ export function ImageCropModal({
         <div className="flex flex-col items-center space-y-4">
           <ReactCrop
             crop={crop}
-            onChange={(_, percentCrop) => setCrop(percentCrop)}
+            onChange={(pixelCrop) => setCrop(pixelCrop)}
             aspect={aspect}
             className="w-full"
           >
