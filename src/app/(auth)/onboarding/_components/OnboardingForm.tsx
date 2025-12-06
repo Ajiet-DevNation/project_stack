@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
@@ -12,17 +12,78 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import { User, GraduationCap, Building2, Calendar, MapPin, FileText, Sparkles, X, Play, ChevronsUpDown } from "lucide-react"
+import { useRouter } from "next/navigation"
 import axios from "axios";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Command, CommandList, CommandGroup, CommandItem, CommandInput, CommandEmpty } from "@/components/ui/command"
-import { PREDEFINED_SKILLS } from "@/lib/skills"
-import { engineeringColleges } from "@/lib/college"
+import { ResponsiveCombobox } from "@/components/ui/ResponsiveCombobox";
+import { engineeringColleges } from "@/lib/college";
+import { PREDEFINED_SKILLS } from "@/lib/skills";
+
+const sections = [
+  "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+  "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+] as const;
+
+const branches = [
+  // B.Tech
+  "B.Tech in Computer Science and Engineering",
+  "B.Tech in Information Technology",
+  "B.Tech in Electronics and Communication Engineering",
+  "B.Tech in Electrical Engineering",
+  "B.Tech in Mechanical Engineering",
+  "B.Tech in Civil Engineering",
+  "B.Tech in Chemical Engineering",
+  "B.Tech in Aerospace Engineering",
+  "B.Tech in Biotechnology",
+  "B.Tech in Artificial Intelligence and Data Science",
+  "B.Tech in Robotics and Automation",
+
+  // M.Tech
+  "M.Tech in Computer Science and Engineering",
+  "M.Tech in Information Technology",
+  "M.Tech in Electronics and Communication Engineering",
+  "M.Tech in Electrical Engineering",
+  "M.Tech in Mechanical Engineering",
+  "M.Tech in Civil Engineering",
+  "M.Tech in Chemical Engineering",
+
+  // B.Sc
+  "B.Sc in Computer Science",
+  "B.Sc in Information Technology",
+  "B.Sc in Physics",
+  "B.Sc in Chemistry",
+  "B.Sc in Mathematics",
+  "B.Sc in Biology",
+  "B.Sc in Biotechnology",
+
+  // M.Sc
+  "M.Sc in Computer Science",
+  "M.Sc in Information Technology",
+  "M.Sc in Physics",
+  "M.Sc in Chemistry",
+  "M.Sc in Mathematics",
+  "M.Sc in Biology",
+  "M.Sc in Biotechnology",
+
+  // Other
+  "Bachelor of Computer Applications (BCA)",
+  "Master of Computer Applications (MCA)",
+] as const;
+
+const years = [
+  "1st",
+  "2nd",
+  "3rd",
+  "4th",
+  "5th (Integrated Courses)"
+] as const;
 
 const schema = z.object({
   name: z.string().min(2, "Please enter your full name"),
-  section: z.string().min(1, "Please enter your section"),
-  branch: z.string().min(2, "Please enter your branch"),
-  year: z.string().min(1, "Please enter your year"),
+  section: z.enum(sections, { message: "Please select a valid section from A-Z." }),
+  branch: z.enum(branches, { message: "Please select a valid branch." }),
+  year: z.enum(years, { message: "Please select a valid year." }),
   college: z.string().refine(
     (val) => engineeringColleges.includes(val),
     { message: "Please select a valid college from the list." }
@@ -50,6 +111,7 @@ const fieldIcons = {
 }
 
 export function OnboardingForm() {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = React.useState(-1) // Start at -1 for welcome screen
   const [completedFields, setCompletedFields] = React.useState<Set<string>>(new Set())
   const [isCollegeComboboxOpen, setIsCollegeComboboxOpen] = React.useState(false);
@@ -58,8 +120,8 @@ export function OnboardingForm() {
     register,
     handleSubmit,
     setValue,
-    watch,
     trigger,
+    control,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<FormValues>({
@@ -67,9 +129,9 @@ export function OnboardingForm() {
     mode: "onChange",
     defaultValues: {
       name: "",
-      section: "",
-      branch: "",
-      year: "",
+      section: undefined,
+      branch: undefined,
+      year: undefined,
       college: "",
       bio: "",
       skills: [],
@@ -77,13 +139,14 @@ export function OnboardingForm() {
   })
 
   // Watch individual fields to avoid infinite loop
-  const name = watch("name")
-  const section = watch("section")
-  const branch = watch("branch")
-  const year = watch("year")
-  const college = watch("college")
-  const bio = watch("bio")
-  const skills = watch("skills")
+  const name = useWatch({ control, name: "name" });
+  const section = useWatch({ control, name: "section" });
+  const branch = useWatch({ control, name: "branch" });
+  const year = useWatch({ control, name: "year" });
+  const college = useWatch({ control, name: "college" });
+  const bio = useWatch({ control, name: "bio" });
+  const skillsWatched = useWatch({ control, name: "skills" });
+  const skills = React.useMemo(() => skillsWatched ?? [], [skillsWatched]);
 
   // Track completed fields with individual dependencies
   React.useEffect(() => {
@@ -114,7 +177,8 @@ export function OnboardingForm() {
       // Force a hard reload to update the session and redirect to home
       // We use window.location.href instead of router.push to ensure 
       // the session is re-fetched from the server
-      window.location.href = "/home";
+      router.push("/home");
+      router.refresh();
     } catch (error) {
       console.error("Error submitting onboarding form:", error);
       // You might want to show an error message to the user here
@@ -198,7 +262,7 @@ export function OnboardingForm() {
           <Button
             onClick={startOnboarding}
             size="lg"
-            className="bg-primary/80 text-primary-foreground hover:bg-primary/90 backdrop-blur-sm"
+            className="cursor-pointer bg-primary/80 text-primary-foreground hover:bg-primary/90 backdrop-blur-sm"
           >
             <Play className="w-4 h-4 mr-2" />
             Start Setup
@@ -316,7 +380,7 @@ export function OnboardingForm() {
                   <Button
                     variant="outline"
                     role="combobox"
-                    className="w-full justify-between"
+                    className="cursor-pointer w-full justify-between"
                   >
                     {skills.length === 0
                       ? "Select your skills"
@@ -332,9 +396,9 @@ export function OnboardingForm() {
 
                     <CommandList>
                       {Object.entries(PREDEFINED_SKILLS).map(
-                        ([category, items]) => (
+                        ([category, items]: [string, string[]]) => (
                           <CommandGroup key={category} heading={category}>
-                            {items.map((skill) => {
+                            {(items as string[]).map((skill: string) => {
                               const selected = skills.includes(skill);
 
                               return (
@@ -457,7 +521,7 @@ export function OnboardingForm() {
               role="combobox"
               aria-expanded={isCollegeComboboxOpen}
               className={cn(
-                "w-full justify-between bg-background/40 backdrop-blur-sm border-border/40 text-foreground placeholder:text-muted-foreground transition-all duration-300 focus:bg-background/60 focus:border-primary/50",
+                "cursor-pointer w-full justify-between bg-background/40 backdrop-blur-sm border-border/40 text-foreground placeholder:text-muted-foreground transition-all duration-300 focus:bg-background/60 focus:border-primary/50",
                 hasError && "border-destructive/50 focus:border-destructive",
                 isCompleted && "border-green-500/30"
               )}
@@ -472,7 +536,7 @@ export function OnboardingForm() {
               <CommandEmpty>No college found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
-                  {engineeringColleges.map((collegeOption) => (
+                  {engineeringColleges.map((collegeOption: string) => (
                     <CommandItem
                       key={collegeOption}
                       onSelect={() => {
@@ -504,6 +568,71 @@ export function OnboardingForm() {
       </motion.div>
     )
   }
+
+  const renderComboboxField = (
+    fieldName: "section" | "branch" | "year",
+    placeholder: string,
+    value: string | undefined
+  ) => {
+    const Icon = fieldIcons[fieldName];
+    const isCompleted = completedFields.has(fieldName);
+    const hasError = errors[fieldName];
+    const options =
+      fieldName === "section"
+        ? sections
+        : fieldName === "branch"
+        ? branches
+        : years;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-2"
+      >
+        <Label
+          htmlFor={fieldName}
+          className="text-foreground font-medium flex items-center gap-2"
+        >
+          <Icon className="w-4 h-4" />
+          {fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
+          {isCompleted && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="w-2 h-2 bg-green-500 rounded-full"
+            />
+          )}
+        </Label>
+        <ResponsiveCombobox
+          options={options as readonly string[]}
+          value={value}
+          onChange={(selectedValue) =>
+            setValue(fieldName, selectedValue as (typeof sections)[number] | (typeof branches)[number] | (typeof years)[number], { shouldValidate: true })
+          }
+          placeholder={placeholder}
+          className={cn(
+            "bg-background/40 backdrop-blur-sm border-border/40 text-foreground placeholder:text-muted-foreground transition-all duration-300 focus:bg-background/60 focus:border-primary/50",
+            hasError && "border-destructive/50 focus:border-destructive",
+            isCompleted && "border-green-500/30"
+          )}
+        />
+        <AnimatePresence>
+          {hasError && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="text-xs text-destructive"
+            >
+              {hasError.message?.toString()}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  };
 
   return (
     <div className="space-y-8">
@@ -548,7 +677,7 @@ export function OnboardingForm() {
             {currentStep === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {renderField('name', 'e.g., Aanya Sharma')}
-                {renderField('section', 'e.g., A / B / C')}
+                {renderComboboxField('section', 'Select your section', section)}
               </div>
             )}
 
@@ -556,8 +685,8 @@ export function OnboardingForm() {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {renderField('branch', 'e.g., CSE / ECE / ME / CE')}
-                  {renderField('year', 'e.g., 1st / 2nd / 3rd / 4th')}
+                  {renderComboboxField('branch', 'Select your branch', branch)}
+                  {renderComboboxField('year', 'Select your year', year)}
                 </div>
                 {renderCollegeField()}
               </div>
@@ -574,24 +703,24 @@ export function OnboardingForm() {
         </AnimatePresence>
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pt-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6">
           <Button
             type="button"
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="border-border/30 text-foreground bg-background/20 backdrop-blur-sm hover:bg-background/30 disabled:opacity-50"
+            className="cursor-pointer w-full sm:w-auto border-border/30 text-foreground bg-background/20 backdrop-blur-sm hover:bg-background/30 disabled:opacity-50"
           >
             Previous
           </Button>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 w-full sm:w-auto">
             <Button
               type="button"
               variant="outline"
               onClick={resetForm}
               disabled={isSubmitting}
-              className="border-border/30 text-foreground bg-background/20 backdrop-blur-sm hover:bg-background/30"
+              className="cursor-pointer w-full sm:w-auto border-border/30 text-foreground bg-background/20 backdrop-blur-sm hover:bg-background/30"
             >
               Start Over
             </Button>
@@ -600,7 +729,7 @@ export function OnboardingForm() {
               <Button
                 type="button"
                 onClick={nextStep}
-                className="bg-primary/80 text-primary-foreground hover:bg-primary/90 backdrop-blur-sm"
+                className="cursor-pointer w-full sm:w-auto bg-primary/80 text-primary-foreground hover:bg-primary/90 backdrop-blur-sm"
               >
                 Next Step
               </Button>
@@ -608,7 +737,7 @@ export function OnboardingForm() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-primary/80 text-primary-foreground hover:bg-primary/90 backdrop-blur-sm"
+                className="cursor-pointer w-full sm:w-auto bg-primary/80 text-primary-foreground hover:bg-primary/90 backdrop-blur-sm"
               >
                 {isSubmitting ? (
                   <motion.div
