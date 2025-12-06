@@ -188,6 +188,7 @@ export function ProfileEditModal({
                       onChange={(url) => {
                         setValue("image", url, { shouldValidate: true });
                       }}
+                      isProfile
                     />
                     {errors.image && (
                       <p className="text-xs sm:text-sm text-destructive animate-in slide-in-from-top-1 duration-200">

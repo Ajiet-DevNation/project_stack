@@ -428,7 +428,7 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
                 onChange={(url) => {
                   setValue("thumbnail", url, { shouldValidate: true });
                 }}
-                aspect={16 / 9}
+                isProject
               />
               {errors.thumbnail && (
                 <p className="text-xs sm:text-sm text-destructive animate-in slide-in-from-top-1 duration-200">
