@@ -28,6 +28,17 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
+      # Upstash
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+
+      # Resend
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+
+      # Contact emails
+      CONTACT_EMAIL_0: ${{ secrets.CONTACT_EMAIL_0 }}
+      CONTACT_EMAIL_1: ${{ secrets.CONTACT_EMAIL_1 }}
+
     strategy:
       matrix:
         node-version: [22]
