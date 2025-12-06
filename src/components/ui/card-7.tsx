@@ -156,14 +156,7 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
       >
         {/* Content Container */}
         <div className="relative flex h-full flex-col p-6 text-card-foreground">
-          {/* Mobile Expand Indicator */}
-          {isMobile && (
-            <div className="absolute top-4 right-4 transition-transform duration-300" style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>
-              <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          )}
+      
           {/* Top Section: Status Badge and GitHub Link */}
           <div className="flex items-start justify-between mb-6">
             <StatusBadge status={status} />
