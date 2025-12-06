@@ -7,37 +7,32 @@ import { MeshGradient, DotOrbit } from "@paper-design/shaders-react"
 // This hook safely checks the user's theme preference
 // and updates when it changes.
 function useTheme() {
-  const [theme, setTheme] = useState<"light" | "dark">("light") // Default to light
+  // Initialize state with a function that runs only once on the client
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    return "light"; // Default for server-side rendering
+  });
 
   useEffect(() => {
-    // This function runs on mount and safely gets the initial theme
-    const getInitialTheme = () => {
-      if (typeof window !== "undefined") {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light"
-      }
-      return "light" // Default for server
-    }
-
-    const initialTheme = getInitialTheme()
-    setTheme(initialTheme)
-
-    // Set up a listener for theme changes
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    // This effect now only handles *updates* to the theme
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? "dark" : "light")
-    }
+      setTheme(e.matches ? "dark" : "light");
+    };
 
-    mediaQuery.addEventListener("change", handleChange)
+    mediaQuery.addEventListener("change", handleChange);
 
     // Cleanup listener on unmount
     return () => {
-      mediaQuery.removeEventListener("change", handleChange)
-    }
-  }, [])
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []); // Empty dependency array means this effect runs once on mount
 
-  return theme
+  return theme;
 }
 
 // --- 2. Define Your Color Palettes ---

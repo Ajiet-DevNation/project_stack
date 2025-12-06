@@ -26,31 +26,31 @@ export function InboxPopup({ profileId, onClose }: InboxPopupProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
 
-    const fetchNotifications = useCallback(async () => {
-        const result = await getAllNotifications(profileId);
-        if (result.success && result.data) {
-            setNotifications(
-                result.data.map((n) => ({
-                    ...n,
-                    createdAt: new Date(n.createdAt),
-                }))
-            );
-        }
-        setLoading(false);
-    }, [profileId]);
-
     const handleClose = useCallback(() => {
         setIsVisible(false);
         setTimeout(onClose, 300);
     }, [onClose]);
 
     useEffect(() => {
+        const fetchNotifications = async () => {
+            const result = await getAllNotifications(profileId);
+            if (result.success && result.data) {
+                setNotifications(
+                    result.data.map((n) => ({
+                        ...n,
+                        createdAt: new Date(n.createdAt),
+                    }))
+                );
+            }
+            setLoading(false);
+        };
+        
         fetchNotifications();
         setTimeout(() => setIsVisible(true), 10);
 
         const interval = setInterval(fetchNotifications, 5000);
         return () => clearInterval(interval);
-    }, [fetchNotifications]);
+    }, [profileId]);
 
     useEffect(() => {
         if (isExpanded) return;

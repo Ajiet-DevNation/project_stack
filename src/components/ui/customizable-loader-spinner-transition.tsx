@@ -16,7 +16,7 @@ export const Component = () => {
   const [showControls, setShowControls] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
     
     // Inject animation styles
     const styleId = 'nested-squares-styles';
@@ -106,6 +106,7 @@ export const Component = () => {
     }
     
     return () => {
+      clearTimeout(timer);
       const style = document.getElementById(styleId);
       if (style && document.head.contains(style)) {
         document.head.removeChild(style);
@@ -126,6 +127,23 @@ export const Component = () => {
       };
     });
   }, [squareCount]);
+
+  const [backgroundElements] = useState(() => {
+    return Array.from({ length: 15 }, (_, i) => ({
+      id: `bg-${i}`,
+      style: {
+        position: 'absolute' as const,
+        width: '2px',
+        height: '2px',
+        backgroundColor: '#a855f7',
+        borderRadius: '50%',
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animation: `glow ${3 + Math.random() * 4}s ease-in-out infinite`,
+        animationDelay: `${Math.random() * 3}s`,
+      },
+    }));
+  });
 
   if (!mounted) {
     return (
@@ -159,20 +177,10 @@ export const Component = () => {
     }}>
       {/* Animated background elements */}
       <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-        {[...Array(15)].map((_, i) => (
+        {backgroundElements.map(el => (
           <div
-            key={`bg-${i}`}
-            style={{
-              position: 'absolute',
-              width: '2px',
-              height: '2px',
-              backgroundColor: '#a855f7',
-              borderRadius: '50%',
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `glow ${3 + Math.random() * 4}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 3}s`,
-            }}
+            key={el.id}
+            style={el.style}
           />
         ))}
       </div>

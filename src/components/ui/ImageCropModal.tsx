@@ -129,6 +129,7 @@ export function ImageCropModal({
             aspect={aspect}
             className="w-full"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               ref={imgRef}
               src={imageSrc} 
