@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, X, ImagePlus } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { ImageCropModal } from "./ImageCropModal"; // Import the new modal
+import { ImageCropModal } from "./ImageCropModal";
+import { Skeleton } from "./skeleton"; // Import the new component
+import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {
   value?: string;
@@ -24,13 +26,19 @@ export function ImageUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
-  // 1. User selects a file
+  // Reset loading state when the image URL changes
+  useEffect(() => {
+    if (value) {
+      setIsImageLoading(true);
+    }
+  }, [value]);
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Read the file and open the cropping modal
     const reader = new FileReader();
     reader.onload = () => {
       setImageToCrop(reader.result as string);
@@ -38,15 +46,12 @@ export function ImageUpload({
     };
     reader.readAsDataURL(file);
     
-    // Clear the input value to allow re-selecting the same file
     e.target.value = "";
   };
 
-  // 3. Upload the cropped image
   const handleUploadCroppedImage = async (blob: Blob) => {
     setIsUploading(true);
     const formData = new FormData();
-    // The server expects a file, so we create one from the blob
     formData.append("file", blob, "cropped-image.png");
 
     try {
@@ -82,7 +87,6 @@ export function ImageUpload({
     <div className="space-y-2">
       <Label className="text-foreground">{label}</Label>
 
-      {/* 2. Show the cropping modal if an image is selected */}
       {imageToCrop && (
         <ImageCropModal
           isOpen={cropModalOpen}
@@ -95,11 +99,16 @@ export function ImageUpload({
 
       {value ? (
         <div className="relative w-full h-48 rounded-md overflow-hidden border border-border group bg-muted">
+          {isImageLoading && <Skeleton className="w-full h-full" />}
           <Image
             src={value}
             alt="Upload preview"
             fill
-            className="object-cover"
+            className={cn(
+              "object-cover transition-opacity duration-300",
+              isImageLoading ? "opacity-0" : "opacity-100"
+            )}
+            onLoadingComplete={() => setIsImageLoading(false)}
           />
           <button
             onClick={handleRemove}
