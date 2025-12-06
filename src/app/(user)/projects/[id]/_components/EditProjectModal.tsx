@@ -2,11 +2,25 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Calendar, Loader2 } from "lucide-react";
+import { X, Calendar, Loader2, ChevronsUpDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { PREDEFINED_SKILLS } from "@/lib/skills";
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+} from "@/components/ui/popover";
+import {
+    Command,
+    CommandList,
+    CommandGroup,
+    CommandItem,
+    CommandInput,
+    CommandEmpty,
+} from "@/components/ui/command";
 
 interface EditProjectModalProps {
     isOpen: boolean;
@@ -47,18 +61,6 @@ export function EditProjectModal({ isOpen, onClose, project }: EditProjectModalP
         endDate: project.endDate ? project.endDate.split("T")[0] : "",
         isActive: project.isActive,
     });
-
-    const [skillInput, setSkillInput] = useState("");
-
-    const handleAddSkill = () => {
-        if (skillInput.trim() && !formData.requiredSkills.includes(skillInput.trim())) {
-            setFormData({
-                ...formData,
-                requiredSkills: [...formData.requiredSkills, skillInput.trim()],
-            });
-            setSkillInput("");
-        }
-    };
 
     const handleRemoveSkill = (skill: string) => {
         setFormData({
@@ -147,40 +149,86 @@ export function EditProjectModal({ isOpen, onClose, project }: EditProjectModalP
                                             <label className="block text-sm font-semibold text-foreground mb-2">
                                                 Required Skills
                                             </label>
-                                            <div className="flex gap-2 mb-3">
-                                                <input
-                                                    type="text"
-                                                    value={skillInput}
-                                                    onChange={(e) => setSkillInput(e.target.value)}
-                                                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddSkill())}
-                                                    placeholder="Add a skill"
-                                                    className="flex-1 px-4 py-2.5 bg-background border-2 border-border rounded-lg transition-colors hover:border-primary/50 text-foreground"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={handleAddSkill}
-                                                    className="px-5 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-medium"
-                                                >
-                                                    Add
-                                                </button>
-                                            </div>
-                                            <div className="flex flex-wrap gap-2">
-                                                {formData.requiredSkills.map((skill) => (
-                                                    <span
-                                                        key={skill}
-                                                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary text-secondary-foreground rounded-full text-sm font-medium"
+
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        className="w-full px-4 py-2.5 bg-background border-2 border-border rounded-lg transition-colors hover:border-primary/50 text-foreground flex items-center justify-between"
                                                     >
-                                                        {skill}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveSkill(skill)}
-                                                            className="hover:text-destructive transition-colors"
+                                                        <span>
+                                                            {formData.requiredSkills.length === 0
+                                                                ? "Select required skills"
+                                                                : `${formData.requiredSkills.length} skill(s) selected`}
+                                                        </span>
+                                                        <ChevronsUpDown className="h-4 w-4 opacity-50" />
+                                                    </button>
+                                                </PopoverTrigger>
+
+                                                <PopoverContent className="w-[400px] p-0 z-[10001]" align="start">
+                                                    <Command>
+                                                        <CommandInput placeholder="Search skills..." />
+                                                        <CommandEmpty>No skills found.</CommandEmpty>
+
+                                                        <CommandList>
+                                                            {Object.entries(PREDEFINED_SKILLS).map(
+                                                                ([category, items]) => (
+                                                                    <CommandGroup key={category} heading={category}>
+                                                                        {items.map((skill) => {
+                                                                            const selected = formData.requiredSkills.includes(skill);
+
+                                                                            return (
+                                                                                <CommandItem
+                                                                                    key={skill}
+                                                                                    onSelect={() => {
+                                                                                        if (selected) {
+                                                                                            handleRemoveSkill(skill);
+                                                                                        } else {
+                                                                                            setFormData({
+                                                                                                ...formData,
+                                                                                                requiredSkills: [...formData.requiredSkills, skill],
+                                                                                            });
+                                                                                        }
+                                                                                    }}
+                                                                                >
+                                                                                    <div
+                                                                                        className={`mr-2 h-4 w-4 rounded-sm border ${selected
+                                                                                            ? "bg-primary border-primary"
+                                                                                            : "border-muted"
+                                                                                            }`}
+                                                                                    />
+                                                                                    {skill}
+                                                                                </CommandItem>
+                                                                            );
+                                                                        })}
+                                                                    </CommandGroup>
+                                                                )
+                                                            )}
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+
+                                            {/* Selected Skill Badges */}
+                                            {formData.requiredSkills.length > 0 && (
+                                                <div className="flex flex-wrap gap-2 mt-3">
+                                                    {formData.requiredSkills.map((skill) => (
+                                                        <span
+                                                            key={skill}
+                                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-full text-sm font-medium"
                                                         >
-                                                            <X className="h-3 w-3" />
-                                                        </button>
-                                                    </span>
-                                                ))}
-                                            </div>
+                                                            {skill}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveSkill(skill)}
+                                                                className="hover:bg-black/20 rounded-full p-1 transition-colors"
+                                                            >
+                                                                <X className="h-3 w-3" />
+                                                            </button>
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Project Status & Active Status */}

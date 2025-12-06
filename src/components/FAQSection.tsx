@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 
 const FAQSection: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -72,7 +73,7 @@ const FAQSection: React.FC = () => {
               {/* Question */}
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full px-6 py-5 flex items-center justify-between text-left transition-all duration-300 group"
+                className="w-full px-6 py-5 flex items-center cursor-pointer justify-between text-left transition-all duration-300 group"
               >
                 <span 
                   className={`text-lg font-semibold transition-colors duration-300 ${
@@ -115,7 +116,7 @@ const FAQSection: React.FC = () => {
             Still have questions?
           </p>
           <button className="px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 bg-secondary text-secondary-foreground shadow-lg shadow-secondary/30">
-            Contact Us
+          <Link href="/contact">Contact Us</Link>
           </button>
         </div>
       </div>

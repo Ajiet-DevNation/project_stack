@@ -112,7 +112,7 @@ export default function LandingPage({
 
             {/* Small Tagline */}
             <p className="text-sm text-muted-foreground/70 pt-8 animate-in fade-in-up delay-800">
-              Free for all students. No limits on ideas.
+              Free for all. No limits on ideas.
             </p>
           </div>
         </section>

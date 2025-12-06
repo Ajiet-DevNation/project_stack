@@ -77,7 +77,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                 variant="outline"
                 size="lg"
                 className={cn(
-                  "w-full flex items-center justify-center gap-3",
+                  "w-full cursor-pointer flex items-center justify-center gap-3",
                   "rounded-lg border-2 border-border/60",
                   "bg-card hover:bg-accent/80",
                   "h-16 text-base font-semibold",
@@ -99,7 +99,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                 variant="outline"
                 size="lg"
                 className={cn(
-                  "w-full flex items-center justify-center gap-3",
+                  "w-full cursor-pointer flex items-center justify-center gap-3",
                   "rounded-lg border-2 border-border/60",
                   "bg-card hover:bg-accent/80",
                   "h-16 text-base font-semibold",

@@ -104,6 +104,33 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
     },
     ref
   ) => {
+    // State for mobile expansion
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    const [isMobile, setIsMobile] = React.useState(false);
+
+    // Detect mobile screen size
+    React.useEffect(() => {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 1024); // lg breakpoint
+      };
+
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+
+      return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Toggle expansion on mobile
+    const handleCardClick = (e: React.MouseEvent) => {
+      // Don't toggle if clicking on links or buttons
+      if (
+        isMobile &&
+        !(e.target as HTMLElement).closest('a, button')
+      ) {
+        setIsExpanded(!isExpanded);
+      }
+    };
+
     // These status borders are semantic and should override the base border
     const borderColors = {
       Planning: "border-blue-400/50",
@@ -115,17 +142,28 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
     return (
       <div
         ref={ref}
+        onClick={handleCardClick}
         className={cn(
           "group relative w-full max-w-7xl min-h-[200px] overflow-hidden rounded-xl shadow-lg z-0",
-          "bg-card border-2 border-border", // Use border-2 to match StatusBadge
-          "transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2",
-          borderColors[status], // This overrides the 'border-border'
+          "bg-card border-2 border-border",
+          "transition-all duration-300 ease-in-out",
+          !isMobile && "hover:shadow-2xl hover:-translate-y-2",
+          isMobile && "cursor-pointer active:scale-[0.99]",
+          borderColors[status],
           className
         )}
         {...props}
       >
         {/* Content Container */}
         <div className="relative flex h-full flex-col p-6 text-card-foreground">
+          {/* Mobile Expand Indicator */}
+          {isMobile && (
+            <div className="absolute top-4 right-4 transition-transform duration-300" style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>
+              <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          )}
           {/* Top Section: Status Badge and GitHub Link */}
           <div className="flex items-start justify-between mb-6">
             <StatusBadge status={status} />
@@ -175,9 +213,13 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
             </div>
           </div>
 
-          {/* Tech Stack Section (shown on hover) */}
+          {/* Tech Stack Section (shown on hover for desktop, on click for mobile) */}
           {techStack.length > 0 && (
-            <div className="transition-all duration-500 ease-in-out opacity-0 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-96 group-hover:mt-8 group-hover:mb-6">
+            <div className={cn(
+              "transition-all duration-500 ease-in-out overflow-hidden",
+              !isMobile && "opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-96 group-hover:mt-8 group-hover:mb-6",
+              isMobile && (isExpanded ? "opacity-100 max-h-96 mt-8 mb-6" : "opacity-0 max-h-0")
+            )}>
               <h4 className="font-semibold text-foreground mb-2 text-xs tracking-wide">
                 TECH STACK
               </h4>
@@ -217,8 +259,12 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
             </div>
           )}
 
-          {/* Bottom Section: Stats and Button (shown on hover) */}
-          <div className="pt-6 border-t border-border transition-all duration-500 ease-in-out opacity-0 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-32">
+          {/* Bottom Section: Stats and Button (shown on hover for desktop, on click for mobile) */}
+          <div className={cn(
+            "pt-6 border-t border-border transition-all duration-500 ease-in-out overflow-hidden",
+            !isMobile && "opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-32",
+            isMobile && (isExpanded ? "opacity-100 max-h-32" : "opacity-0 max-h-0")
+          )}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
