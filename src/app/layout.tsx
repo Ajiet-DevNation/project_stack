@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     siteName: "Project Stack",
     images: [
       {
-        url: "/logo.png",
+        url: "/banner.png",
         width: 800,
         height: 600,
         alt: "Project Stack Logo",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Project Stack",
     description: "Collaborate on projects seamlessly with Project Stack.",
-    images: ["/logo.png"],
+    images: ["/banner.png"],
     creator: "@projectstack", 
   },
   robots: {
