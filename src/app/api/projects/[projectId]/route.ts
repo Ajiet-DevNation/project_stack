@@ -115,6 +115,7 @@ export async function DELETE(
     }
 
     const { projectId } = await params;
+    const validatedProjectId = z.string().cuid().parse(projectId);
 
     // Get project with applicants and contributors
     const project = await db.project.findUnique({
