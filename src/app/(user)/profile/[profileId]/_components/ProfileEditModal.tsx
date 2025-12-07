@@ -34,6 +34,7 @@ import {
 import { X, Save, ChevronsUpDown, Info, Check } from "lucide-react";
 import axios from "axios";
 import { Profile } from "@/types/profile";
+import { branches, sections, years } from "@/lib/profileConstants";
 import { engineeringColleges } from "@/lib/college";
 import { PREDEFINED_SKILLS } from "@/lib/skills";
 import { cn } from "@/lib/utils";
@@ -54,6 +55,9 @@ export function ProfileEditModal({
 }: ProfileEditModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCollegeComboboxOpen, setIsCollegeComboboxOpen] = useState(false);
+  const [isSectionComboboxOpen, setIsSectionComboboxOpen] = useState(false);
+  const [isBranchComboboxOpen, setIsBranchComboboxOpen] = useState(false);
+  const [isYearComboboxOpen, setIsYearComboboxOpen] = useState(false);
   const submitLockRef = useRef(false);
   const { data: session } = useSession();
 
@@ -165,22 +169,6 @@ export function ProfileEditModal({
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  {/* <Label htmlFor="image" className="text-foreground text-sm sm:text-base">
-                                        Custom Profile Image URL (Optional)
-                                    </Label>
-                                    <Input
-                                        id="image"
-                                        placeholder="https://example.com/image.jpg"
-                                        {...register("image")}
-                                        className={cn(
-                                            "mt-1 bg-background/40 backdrop-blur-sm border-border/40",
-                                            "text-sm sm:text-base h-9 sm:h-10",
-                                            errors.image && "border-destructive"
-                                        )}
-                                    />
-                                    {errors.image && (
-                                        <p className="text-xs text-destructive mt-1">{errors.image.message}</p>
-                                    )} */}
                   <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-left-2 duration-500 delay-[450ms]">
                     <ImageUpload
                       label="Profile Image"
@@ -202,8 +190,7 @@ export function ProfileEditModal({
                 <div className="flex items-start gap-2 p-3 bg-primary/5 border border-primary/20 rounded-md">
                   <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                   <p className="text-xs text-muted-foreground">
-                    Your OAuth provider image is being used. Add a custom URL
-                    above to override it.
+                    Your OAuth provider image is being used. Add your custom image to override it.
                   </p>
                 </div>
               )}
@@ -240,16 +227,51 @@ export function ProfileEditModal({
                 >
                   Section
                 </Label>
-                <Input
-                  id="section"
-                  placeholder="A, B, C..."
-                  {...register("section")}
-                  className={cn(
-                    "bg-background/40 backdrop-blur-sm border-border/40",
-                    "text-sm sm:text-base h-9 sm:h-10 md:h-11",
-                    errors.section && "border-destructive"
-                  )}
-                />
+                <Popover
+                  open={isSectionComboboxOpen}
+                  onOpenChange={setIsSectionComboboxOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={isSectionComboboxOpen}
+                      className={cn(
+                        "w-full justify-between bg-background/40 backdrop-blur-sm border-border/40",
+                        "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                        errors.section && "border-destructive"
+                      )}
+                    >
+                      <span className="truncate">
+                        {watch("section") || "Select your section"}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command onWheelCapture={(e) => e.stopPropagation()}>
+                      <CommandInput placeholder="Search section..." />
+                      <CommandEmpty>No section found.</CommandEmpty>
+                      <CommandList className="max-h-[300px] overflow-y-auto">
+                        <CommandGroup>
+                          {sections.map((sectionOption) => (
+                            <CommandItem
+                              key={sectionOption}
+                              onSelect={() => {
+                                setValue("section", sectionOption, {
+                                  shouldValidate: true,
+                                });
+                                setIsSectionComboboxOpen(false);
+                              }}
+                            >
+                              {sectionOption}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 {errors.section && (
                   <p className="text-xs text-destructive mt-1">
                     {errors.section.message}
@@ -264,16 +286,51 @@ export function ProfileEditModal({
                 >
                   Branch
                 </Label>
-                <Input
-                  id="branch"
-                  placeholder="Computer Science Engineering"
-                  {...register("branch")}
-                  className={cn(
-                    "bg-background/40 backdrop-blur-sm border-border/40",
-                    "text-sm sm:text-base h-9 sm:h-10 md:h-11",
-                    errors.branch && "border-destructive"
-                  )}
-                />
+                <Popover
+                  open={isBranchComboboxOpen}
+                  onOpenChange={setIsBranchComboboxOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={isBranchComboboxOpen}
+                      className={cn(
+                        "w-full justify-between bg-background/40 backdrop-blur-sm border-border/40",
+                        "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                        errors.branch && "border-destructive"
+                      )}
+                    >
+                      <span className="truncate">
+                        {watch("branch") || "Select your branch"}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command onWheelCapture={(e) => e.stopPropagation()}>
+                      <CommandInput placeholder="Search branch..." />
+                      <CommandEmpty>No branch found.</CommandEmpty>
+                      <CommandList className="max-h-[300px] overflow-y-auto">
+                        <CommandGroup>
+                          {branches.map((branchOption) => (
+                            <CommandItem
+                              key={branchOption}
+                              onSelect={() => {
+                                setValue("branch", branchOption, {
+                                  shouldValidate: true,
+                                });
+                                setIsBranchComboboxOpen(false);
+                              }}
+                            >
+                              {branchOption}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 {errors.branch && (
                   <p className="text-xs text-destructive mt-1">
                     {errors.branch.message}
@@ -288,16 +345,51 @@ export function ProfileEditModal({
                 >
                   Year
                 </Label>
-                <Input
-                  id="year"
-                  placeholder="1st Year, 2nd Year..."
-                  {...register("year")}
-                  className={cn(
-                    "bg-background/40 backdrop-blur-sm border-border/40",
-                    "text-sm sm:text-base h-9 sm:h-10 md:h-11",
-                    errors.year && "border-destructive"
-                  )}
-                />
+                <Popover
+                  open={isYearComboboxOpen}
+                  onOpenChange={setIsYearComboboxOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={isYearComboboxOpen}
+                      className={cn(
+                        "w-full justify-between bg-background/40 backdrop-blur-sm border-border/40",
+                        "text-sm sm:text-base h-9 sm:h-10 md:h-11",
+                        errors.year && "border-destructive"
+                      )}
+                    >
+                      <span className="truncate">
+                        {watch("year") || "Select your year"}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command onWheelCapture={(e) => e.stopPropagation()}>
+                      <CommandInput placeholder="Search year..." />
+                      <CommandEmpty>No year found.</CommandEmpty>
+                      <CommandList className="max-h-[300px] overflow-y-auto">
+                        <CommandGroup>
+                          {years.map((yearOption) => (
+                            <CommandItem
+                              key={yearOption}
+                              onSelect={() => {
+                                setValue("year", yearOption, {
+                                  shouldValidate: true,
+                                });
+                                setIsYearComboboxOpen(false);
+                              }}
+                            >
+                              {yearOption}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 {errors.year && (
                   <p className="text-xs text-destructive mt-1">
                     {errors.year.message}
@@ -334,10 +426,10 @@ export function ProfileEditModal({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0" align="start">
-                    <Command>
+                    <Command onWheelCapture={(e) => e.stopPropagation()}>
                       <CommandInput placeholder="Search college..." />
                       <CommandEmpty>No college found.</CommandEmpty>
-                      <CommandList>
+                      <CommandList className="max-h-[300px] overflow-y-auto">
                         <CommandGroup>
                           {engineeringColleges.map((collegeOption) => (
                             <CommandItem
@@ -425,7 +517,7 @@ export function ProfileEditModal({
                   className="w-[var(--radix-popover-trigger-width)] p-0"
                   align="start"
                 >
-                  <Command>
+                  <Command onWheelCapture={(e) => e.stopPropagation()}>
                     <CommandInput
                       placeholder="Search skills..."
                       className="h-9"
