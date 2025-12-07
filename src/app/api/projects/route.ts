@@ -76,7 +76,14 @@ export async function GET(req: Request) {
       skip: (page - 1) * limit,
       take: limit,
       where,
-      orderBy: { postedOn: "desc" },
+      orderBy: [
+        {
+          projectStatus: 'asc' as const
+        },
+        {
+          postedOn: 'desc' as const
+        }
+      ],
       include: {
         author: {
           select: {
@@ -96,7 +103,26 @@ export async function GET(req: Request) {
       },
     });
 
-    return new Response(JSON.stringify(projects), { status: 200 });
+    // Custom sort to ensure Active > Planning > Completed
+    const sortedProjects = projects.sort((a, b) => {
+      const statusOrder: Record<string, number> = {
+        'Active': 1,
+        'Planning': 2,
+        'Completed': 3
+      };
+
+      const orderA = statusOrder[a.projectStatus] || 999;
+      const orderB = statusOrder[b.projectStatus] || 999;
+
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+
+      // If same status, sort by posted date (newest first)
+      return new Date(b.postedOn).getTime() - new Date(a.postedOn).getTime();
+    });
+
+    return new Response(JSON.stringify(sortedProjects), { status: 200 });
   } catch (error) {
     console.error(error);
     return new Response("Internal Server Error", { status: 500 });

@@ -20,7 +20,11 @@ export default function Home() {
   };
 
   const handleExploreProjects = () => {
-    router.push("/home");
+    if (session) {
+      router.push("/home");
+    } else {
+      setLoginOpen(true);
+    }
   };
 
   return (
