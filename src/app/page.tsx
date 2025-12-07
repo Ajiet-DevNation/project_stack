@@ -9,11 +9,10 @@ export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(searchParams.get("login") === "true");
 
   useEffect(() => {
     if (searchParams.get("login") === "true") {
-      setLoginOpen(true);
       router.replace("/", { scroll: false });
     }
   }, [searchParams, router]);
