@@ -18,6 +18,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Command, CommandList, CommandGroup, CommandItem, CommandInput, CommandEmpty } from "@/components/ui/command"
 import { ResponsiveCombobox } from "@/components/ui/ResponsiveCombobox";
 import { engineeringColleges } from "@/lib/college";
+import { getSkillIcon } from "@/lib/skillIcons";
 import { PREDEFINED_SKILLS } from "@/lib/skills";
 
 import { sections, branches, years } from "@/lib/profileConstants";
@@ -32,14 +33,14 @@ const schema = z.object({
     { message: "Please select a valid college from the list." }
   ),
   bio: z.string().min(10, "Tell us a bit more (min 10 chars)").max(300, "Max 300 characters"),
-  skills: z.array(z.string().min(1)).min(1, "Add at least one skill"),
+  skills: z.array(z.string().min(1)).min(1, "Add at least one skill").max(10, "You can select a maximum of 10 skills"),
 })
 
 type FormValues = z.infer<typeof schema>
 
 const formSteps = [
-  { id: 'personal', title: 'Personal Info', fields: ['name', 'section'] },
-  { id: 'academic', title: 'Academic Details', fields: ['branch', 'year', 'college'] },
+  { id: 'personal', title: 'Personal Info', fields: ['name', 'college'] },
+  { id: 'academic', title: 'Academic Details', fields: ['branch', 'section', 'year'] },
   { id: 'profile', title: 'Profile & Skills', fields: ['bio', 'skills'] }
 ]
 
@@ -347,17 +348,20 @@ export function OnboardingForm() {
                               return (
                                 <CommandItem
                                   key={skill}
+                                  disabled={!selected && skills.length >= 10}
                                   onSelect={() => {
                                     if (selected) {
                                       handleRemoveSkill(skill);
                                     } else {
-                                      setValue(
-                                        "skills",
-                                        [...skills, skill],
-                                        {
-                                          shouldValidate: true,
-                                        }
-                                      );
+                                      if (skills.length < 10) {
+                                        setValue(
+                                          "skills",
+                                          [...skills, skill],
+                                          {
+                                            shouldValidate: true,
+                                          }
+                                        );
+                                      }
                                     }
                                   }}
                                 >
@@ -388,29 +392,33 @@ export function OnboardingForm() {
               exit={{ opacity: 0, height: 0 }}
               className="flex flex-wrap gap-2"
             >
-              {skills.map((skill: string, index: number) => (
-                <motion.div
-                  key={skill}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <Badge
-                    variant="secondary"
-                    className="bg-primary/20 text-foreground border border-border/20 backdrop-blur-sm hover:bg-primary/30 transition-colors group"
+              {skills.map((skill: string, index: number) => {
+                const Icon = getSkillIcon(skill);
+                return (
+                  <motion.div
+                    key={skill}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ delay: index * 0.05 }}
                   >
-                    {skill}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSkill(skill)}
-                      className="ml-2 hover:text-destructive transition-colors"
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary/20 text-foreground border border-border/20 backdrop-blur-sm hover:bg-primary/30 transition-colors group"
                     >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </Badge>
-                </motion.div>
-              ))}
+                      {Icon && <Icon className="mr-2 h-4 w-4" />}
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkill(skill)}
+                        className="ml-2 hover:text-destructive transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>
@@ -620,7 +628,7 @@ export function OnboardingForm() {
             {currentStep === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {renderField('name', 'e.g., Aanya Sharma')}
-                {renderComboboxField('section', 'Select your section', section)}
+                {renderCollegeField()}
               </div>
             )}
 
@@ -629,9 +637,9 @@ export function OnboardingForm() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {renderComboboxField('branch', 'Select your branch', branch)}
-                  {renderComboboxField('year', 'Select your year', year)}
+                  {renderComboboxField('section', 'Select your section', section)}
                 </div>
-                {renderCollegeField()}
+                {renderComboboxField('year', 'Select your year', year)}
               </div>
             )}
 

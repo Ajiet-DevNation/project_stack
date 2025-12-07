@@ -54,5 +54,6 @@ export const years = [
   "2nd",
   "3rd",
   "4th",
-  "5th (Integrated Courses)"
+  "5th (Integrated Courses)",
+  "Alumni"
 ] as const;
