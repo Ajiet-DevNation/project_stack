@@ -3,44 +3,58 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Dock, DockItem, DockIcon, DockLabel } from "@/components/ui/dock";
-import { Plus, Inbox, Search, User as UserIcon } from "lucide-react"; 
+import { Plus, Inbox, Search, User as UserIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { InboxPopup } from "./InboxPopup";
 import { getNotificationCount } from "../../actions/notifications";
 import { ActionSearchBar } from "@/components/ui/action-search-bar";
 import { AnimatePresence, motion } from "framer-motion";
 
-
-const DockLogo = () => (
-  <Link href="/home" className="flex items-center gap-4">
+const DockLogo = () => {
+  const router = useRouter();
+  return (
     <div
-      className={cn(
-        "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center",
-        "bg-primary"
-      )}
+      onClick={() => router.push("/home")}
+      className="flex items-center gap-4 cursor-pointer group"
     >
-      <span className="text-primary-foreground font-bold text-sm">PS</span>
+      <div className="relative w-8 h-8 shrink-0">
+        <Image
+          src="/logo.png"
+          alt="ProjectStack"
+          fill
+          className="object-contain"
+        />
+      </div>
+      <span className="font-bold text-lg text-foreground hidden md:block transition-all duration-300 group-hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.7)]">
+        ProjectStack
+      </span>
     </div>
-    <span className="font-bold text-lg text-foreground ">
-      ProjectStack
-    </span>
-  </Link>
-);
+  );
+};
 
 interface ProjectStackDockProps {
   onOpenCreateModal: () => void;
   profileId?: string;
-  userImage?: string | null; 
+  userImage?: string | null;
 }
 
 export function ProjectStackDock({
   onOpenCreateModal,
   profileId,
-  userImage, 
+  userImage,
 }: ProjectStackDockProps) {
   const [showInbox, setShowInbox] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (!profileId) return;
@@ -65,7 +79,6 @@ export function ProjectStackDock({
     setIsSearchVisible((prev) => !prev);
   };
 
-
   return (
     <>
       <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none z-20">
@@ -79,7 +92,10 @@ export function ProjectStackDock({
           distance={111}
           panelHeight={58}
         >
-          <DockItem baseWidth={180} magnification={180}>
+          <DockItem
+            baseWidth={isMobile ? 60 : 180}
+            magnification={isMobile ? 60 : 180}
+          >
             <DockIcon>
               <DockLogo />
             </DockIcon>
@@ -133,9 +149,9 @@ export function ProjectStackDock({
                     <Image
                       src={userImage}
                       alt="Profile"
-                      width={32} 
+                      width={32}
                       height={32}
-                      className="rounded-full object-contain" 
+                      className="rounded-full object-contain"
                     />
                   ) : (
                     <div className="w-full h-full rounded-full border-2 border-green-500 bg-muted flex items-center justify-center">
@@ -147,7 +163,6 @@ export function ProjectStackDock({
             </DockIcon>
             <DockLabel>Profile</DockLabel>
           </DockItem>
-
         </Dock>
       </div>
 
@@ -172,7 +187,10 @@ export function ProjectStackDock({
               className="w-full max-w-3xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <ActionSearchBar autoFocus={isSearchVisible} onClose={toggleSearch} />
+              <ActionSearchBar
+                autoFocus={isSearchVisible}
+                onClose={toggleSearch}
+              />
             </motion.div>
           </motion.div>
         )}
