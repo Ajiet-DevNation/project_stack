@@ -18,6 +18,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Command, CommandList, CommandGroup, CommandItem, CommandInput, CommandEmpty } from "@/components/ui/command"
 import { ResponsiveCombobox } from "@/components/ui/ResponsiveCombobox";
 import { engineeringColleges } from "@/lib/college";
+import { getSkillIcon } from "@/lib/skillIcons";
 import { PREDEFINED_SKILLS } from "@/lib/skills";
 
 import { sections, branches, years } from "@/lib/profileConstants";
@@ -391,29 +392,33 @@ export function OnboardingForm() {
               exit={{ opacity: 0, height: 0 }}
               className="flex flex-wrap gap-2"
             >
-              {skills.map((skill: string, index: number) => (
-                <motion.div
-                  key={skill}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <Badge
-                    variant="secondary"
-                    className="bg-primary/20 text-foreground border border-border/20 backdrop-blur-sm hover:bg-primary/30 transition-colors group"
+              {skills.map((skill: string, index: number) => {
+                const Icon = getSkillIcon(skill);
+                return (
+                  <motion.div
+                    key={skill}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ delay: index * 0.05 }}
                   >
-                    {skill}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSkill(skill)}
-                      className="ml-2 hover:text-destructive transition-colors"
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary/20 text-foreground border border-border/20 backdrop-blur-sm hover:bg-primary/30 transition-colors group"
                     >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </Badge>
-                </motion.div>
-              ))}
+                      {Icon && <Icon className="mr-2 h-4 w-4" />}
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkill(skill)}
+                        className="ml-2 hover:text-destructive transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>

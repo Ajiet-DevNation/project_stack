@@ -31,6 +31,8 @@ interface Project {
   };
 }
 
+import { getSkillIcon } from "@/lib/skillIcons";
+
 export default function ProjectCard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,10 +134,13 @@ export default function ProjectCard() {
                 likes={project._count.likes}
                 href={`/projects/${project.id}` || "#"}
                 githubUrl={project.githubLink || undefined}
-                techStack={project.requiredSkills.map((skill) => ({
-                  name: skill,
-                  icon: <Code2 className="w-5 h-5" />,
-                }))}
+                techStack={project.requiredSkills.map((skill) => {
+                  const Icon = getSkillIcon(skill) || Code2;
+                  return {
+                    name: skill,
+                    icon: <Icon className="w-5 h-5" />,
+                  };
+                })}
                 aria-label={`Project card for ${project.title}`}
               />
             </div>
