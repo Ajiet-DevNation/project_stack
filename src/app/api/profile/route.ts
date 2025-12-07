@@ -3,14 +3,22 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { z } from "zod";
 import { NextResponse } from "next/server";
+import { sections, branches, years } from "@/lib/profileConstants";
+import { ALL_PREDEFINED_SKILLS } from "@/lib/skills";
 
 // Zod schema to validate the incoming profile data
 const createProfileSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
-  branch: z.string().min(1, "Branch is required"),
-  year: z.string().min(1, "Year is required"),
-  section: z.string().min(1, "Section is required"),
-  skills: z.array(z.string()).nonempty("At least one skill is required"),
+  branch: z.enum(branches, { message: "Please select a valid branch." }),
+  year: z.enum(years, { message: "Please select a valid year." }),
+  section: z.enum(sections, { message: "Please select a valid section from A-Z." }),
+  skills: z
+    .array(
+      z.string().refine((skill) => ALL_PREDEFINED_SKILLS.includes(skill), {
+        message: "Invalid skill selected",
+      })
+    )
+    .nonempty("At least one skill is required"),
   bio: z.string().max(250, "Bio must be less than 250 characters").optional(),
   image: z.string().url("Invalid image URL").optional(),
 });
