@@ -4,6 +4,8 @@ import { ProjectCard as ProjectShowcaseCard } from "@/components/ui/card-7";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Code2 } from "lucide-react";
 import Loader from "./Loader";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Project {
   id: string;
@@ -41,16 +43,26 @@ export default function ProjectCard() {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastProjectRef = useRef<HTMLDivElement | null>(null);
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleViewProject = useCallback((href: string) => {
+    if (!session) {
+      router.push("/?login=true");
+    } else {
+      router.push(href);
+    }
+  }, [session, router]);
 
   const fetchProjects = useCallback(async (pageNum: number) => {
     try {
       const response = await fetch(`/api/projects?page=${pageNum}&limit=10`);
       const data: Project[] = await response.json();
-      
+
       if (data.length < 10) {
         setHasMore(false);
       }
-      
+
       return data;
     } catch (error) {
       console.error("Failed to fetch projects:", error);
@@ -58,7 +70,6 @@ export default function ProjectCard() {
     }
   }, []);
 
-  // Initial fetch
   useEffect(() => {
     async function initialFetch() {
       const data = await fetchProjects(1);
@@ -68,21 +79,19 @@ export default function ProjectCard() {
     initialFetch();
   }, [fetchProjects]);
 
-  // Fetch more when page changes
   useEffect(() => {
-    if (page === 1) return; // Skip initial fetch
-    
+    if (page === 1) return; 
+
     async function fetchMore() {
       setIsFetchingMore(true);
       const data = await fetchProjects(page);
       setProjects(prev => [...prev, ...data]);
       setIsFetchingMore(false);
     }
-    
+
     fetchMore();
   }, [page, fetchProjects]);
 
-  // Intersection Observer for infinite scroll
   useEffect(() => {
     if (loading || !hasMore) return;
 
@@ -134,6 +143,7 @@ export default function ProjectCard() {
                 likes={project._count.likes}
                 href={`/projects/${project.id}` || "#"}
                 githubUrl={project.githubLink || undefined}
+                onViewProject={handleViewProject}
                 techStack={project.requiredSkills.map((skill) => {
                   const Icon = getSkillIcon(skill) || Code2;
                   return {
@@ -145,15 +155,13 @@ export default function ProjectCard() {
               />
             </div>
           ))}
-          
-          {/* Loading indicator for fetching more */}
+
           {isFetchingMore && (
             <div className="flex justify-center py-8">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
           )}
-          
-          {/* End of list message */}
+
           {!hasMore && projects.length > 0 && (
             <div className="text-center py-8 text-muted-foreground">
               You&apos;ve reached the end of the list

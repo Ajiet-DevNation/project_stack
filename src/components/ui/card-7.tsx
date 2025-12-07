@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -85,6 +87,8 @@ interface ProjectCardProps extends React.HTMLAttributes<HTMLDivElement> {
   href: string;
   githubUrl?: string; // Optional GitHub URL
   techStack?: TechStackItem[]; // Optional tech stack array
+  isAuthenticated?: boolean; // Whether user is logged in
+  onViewProject?: (href: string) => void; // Callback for view project click
 }
 
 const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
@@ -100,6 +104,8 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
       href,
       githubUrl,
       techStack = [],
+      isAuthenticated,
+      onViewProject,
       ...props
     },
     ref
@@ -156,7 +162,7 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
       >
         {/* Content Container */}
         <div className="relative flex h-full flex-col p-6 text-card-foreground">
-      
+
           {/* Top Section: Status Badge and GitHub Link */}
           <div className="flex items-start justify-between mb-6">
             <StatusBadge status={status} />
@@ -278,16 +284,28 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
                 </div> */}
               </div>
               <Button
-                asChild
+                onClick={(e) => {
+                  if (onViewProject) {
+                    e.preventDefault();
+                    onViewProject(href);
+                  }
+                }}
+                asChild={!onViewProject}
                 className={cn(
-                  "h-11 rounded-md px-8",
-                  "bg-primary text-primary-foreground", // Use primary colors
-                  "hover:bg-primary/90" // Standard hover for primary
+                  "h-11 rounded-md px-8 cursor-pointer",
+                  "bg-primary text-primary-foreground",
+                  "hover:bg-primary/90"
                 )}
               >
-                <Link href={href}>
-                  View Project <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+                {onViewProject ? (
+                  <span className="flex items-center">
+                    View Project <ArrowRight className="ml-2 h-4 w-4" />
+                  </span>
+                ) : (
+                  <Link href={href}>
+                    View Project <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                )}
               </Button>
             </div>
           </div>

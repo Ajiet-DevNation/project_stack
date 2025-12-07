@@ -1,30 +1,29 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
 import { LoginModal } from "@/components/LoginModal";
 
 export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
-
+  const searchParams = useSearchParams();
   const [loginOpen, setLoginOpen] = useState(false);
 
-  const handleGetStarted = () => {
-    if (session) {
-      router.push("/home");
-    } else {
+  useEffect(() => {
+    if (searchParams.get("login") === "true") {
       setLoginOpen(true);
+      router.replace("/", { scroll: false });
     }
+  }, [searchParams, router]);
+
+  const handleGetStarted = () => {
+    setLoginOpen(true);
   };
 
   const handleExploreProjects = () => {
-    if (session) {
-      router.push("/home");
-    } else {
-      setLoginOpen(true);
-    }
+    router.push("/home");
   };
 
   return (
