@@ -14,7 +14,7 @@ export const projectSchema = z
       if (!arg) return undefined;
       return arg;
     }, z.coerce.date().optional()),
-    githubLink: z.string().url().optional().or(z.literal("")),
+    githubLink: z.string().url("Invalid URL format").regex(/^(https?:\/\/)?(www\.)?github\.com\/.*/i, "Must be a valid GitHub link").optional().or(z.literal("")),
     liveUrl: z.string().url().optional().or(z.literal("")),
     thumbnail: z.string().url().optional().or(z.literal("")),
     projectStatus: z.string().min(1),

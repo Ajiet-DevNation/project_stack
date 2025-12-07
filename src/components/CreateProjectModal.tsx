@@ -573,7 +573,7 @@ export function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
                   type="date"
 
-                  {...register("endDate", { valueAsDate: true })}
+                  {...register("endDate")}
 
                   className={cn(
 
