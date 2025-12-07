@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import DemoOne from "@/components/ShaderBackground";
 import { ExternalLink, Github, Calendar, Users } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -51,6 +52,43 @@ interface ApiProject {
   }[];
   screenshots?: string[];
   videoUrl?: string | null;
+}
+
+export async function generateMetadata({
+  params,
+}: ProjectPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const project = await getProject(id);
+
+  if (!project) {
+    return {
+      title: "Project Not Found",
+    };
+  }
+
+  return {
+    title: project.title,
+    description: project.description.substring(0, 160), // Good practice to limit length
+    openGraph: {
+      title: project.title,
+      description: project.description.substring(0, 160),
+      images: [
+        {
+          // Use the project thumbnail if available, otherwise fallback to logo
+          url: project.thumbnail || "/logo.png",
+          width: 1200,
+          height: 630,
+          alt: project.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: project.description.substring(0, 160),
+      images: [project.thumbnail || "/logo.png"],
+    },
+  };
 }
 
 async function getProject(id: string): Promise<ApiProject | null> {
