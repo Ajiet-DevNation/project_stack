@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2, Mail, User, MessageSquare, Send } from "lucide-react";
-import DemoOne from "@/components/ShaderBackground";
 import { cn } from "@/lib/utils";
 import { sendContactEmail } from "../../../actions/contact";
 
@@ -59,9 +58,6 @@ export default function Contact() {
 
     return (
         <>
-            <div className="fixed -z-10 h-full w-screen">
-                <DemoOne />
-            </div>
             <main className="relative mb-20 z-10 min-h-screen flex flex-col items-center justify-center px-4 py-20">
                 <div className="w-full max-w-2xl">
                     <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">

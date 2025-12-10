@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import DemoOne from "@/components/ShaderBackground";
 import { ExternalLink, Github, Calendar, Users } from "lucide-react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -180,10 +179,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <>
-      <div className="fixed -z-10 h-full w-screen">
-        <DemoOne />
-      </div>
-
       <main className="relative min-h-screen pb-20">
         <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-10">
           <div className="w-full px-4 py-4 sm:px-6 lg:px-8">

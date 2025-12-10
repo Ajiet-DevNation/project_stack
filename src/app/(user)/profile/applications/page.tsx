@@ -1,5 +1,4 @@
 // app/(user)/profile/applications/page.tsx
-import DemoOne from "@/components/ShaderBackground";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
@@ -31,10 +30,6 @@ export default async function MyApplicationsPage() {
 
     return (
         <>
-            <div className="fixed -z-10 h-full w-screen">
-                <DemoOne />
-            </div>
-
             <main className="relative z-0 min-h-screen pb-20">
                 <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
                     <div className="mb-8">
