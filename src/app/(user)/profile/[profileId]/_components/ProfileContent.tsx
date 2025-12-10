@@ -25,6 +25,7 @@ import { signOut, useSession } from "next-auth/react";
 import { getUserContributions } from "../../../../../../actions/applications";
 import { Project, Profile, Contribution } from "@/types/profile";
 import Loader from "@/components/Loader";
+import { getSkillIcon } from "@/lib/skillIcons";
 
 interface ProfileContentProps {
   profileId?: string;
@@ -251,21 +252,25 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                         Skills
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {profile.skills.map((skill, index) => (
-                          <motion.div
-                            key={skill}
-                            initial={{ opacity: 0, scale: 0 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.8 + index * 0.05 }}
-                          >
-                            <Badge
-                              variant="secondary"
-                              className="bg-primary/20 text-foreground border border-border/20 backdrop-blur-sm"
+                        {profile.skills.map((skill, index) => {
+                          const Icon = getSkillIcon(skill);
+                          return (
+                            <motion.div
+                              key={skill}
+                              initial={{ opacity: 0, scale: 0 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.8 + index * 0.05 }}
                             >
-                              {skill}
-                            </Badge>
-                          </motion.div>
-                        ))}
+                              <Badge
+                                variant="secondary"
+                                className="bg-primary/20 text-foreground border border-border/20 backdrop-blur-sm flex items-center gap-2"
+                              >
+                                {Icon && <Icon className="w-4 h-4" />}
+                                {skill}
+                              </Badge>
+                            </motion.div>
+                          );
+                        })}
                       </div>
                     </motion.div>
                   )}

@@ -20,23 +20,18 @@ function PageWrapper({ children }: PageWrapperProps) {
         return () => clearTimeout(timer)
     }, [])
 
-    if (isLoading) {
-        return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div className="fixed -z-10 h-full w-screen">
-                    <DemoOne />
-                </div>
-                <Loader />
-            </div>
-        )
-    }
-
     return (
         <>
             <div className="fixed -z-10 h-full w-screen">
                 <DemoOne />
             </div>
-            {children}
+            {isLoading ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <Loader />
+                </div>
+            ) : (
+                children
+            )}
         </>
     )
 }

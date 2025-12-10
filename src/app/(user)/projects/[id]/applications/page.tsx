@@ -1,4 +1,4 @@
-import DemoOne from "@/components/ShaderBackground";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
@@ -35,10 +35,6 @@ export default async function ApplicationsPage({ params }: ApplicationsPageProps
 
     return (
         <>
-            <div className="fixed -z-10 h-full w-screen">
-                <DemoOne />
-            </div>
-
             <main className="relative z-0 min-h-screen pb-20">
                 <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-10">
                     <div className="w-full px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
