@@ -59,6 +59,9 @@ import {
   SiScikitlearn,
   SiPandas,
   SiNumpy,
+  SiCplusplus,
+  SiSharp,
+  SiC,
 } from "react-icons/si";
 
 import {
@@ -165,9 +168,9 @@ const skillIconMap: Record<string, IconType> = {
   Swift: SiSwift,
   PHP: SiPhp,
   Ruby: SiRuby,
-  "C#": FaCode,
-  "C++": FaCode,
-  C: FaCode,
+  "C#": SiSharp,
+  "C++": SiCplusplus,
+  C: SiC,
   "React Native": SiReact,
   Flutter: SiFlutter,
   Cybersecurity: FaShieldAlt,
