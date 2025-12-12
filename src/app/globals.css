@@ -44,10 +44,8 @@
   --sidebar-primary-foreground: #fbfbfb;
 
   /* --- Glow effects from file 2 --- */
-  --glow-minty: 0 0 20px hsl(159 31% 80% / 0.6),
-    0 0 40px hsl(159 31% 80% / 0.3);
-  --glow-primary: 0 0 20px hsl(32 28% 23% / 0.6),
-    0 0 40px hsl(32 28% 23% / 0.3);
+  --glow-minty: 0 0 20px hsl(159 31% 80% / 0.6), 0 0 40px hsl(159 31% 80% / 0.3);
+  --glow-primary: 0 0 20px hsl(32 28% 23% / 0.6), 0 0 40px hsl(32 28% 23% / 0.3);
 }
 
 .dark {
@@ -170,12 +168,10 @@ body {
   }
 
   .name-glow:hover {
-    text-shadow: 
-      0 0 10px rgba(189, 156, 122, 0.8),
-      0 0 20px rgba(189, 156, 122, 0.6),
-      0 0 30px rgba(189, 156, 122, 0.4),
+    text-shadow: 0 0 10px rgba(189, 156, 122, 0.8),
+      0 0 20px rgba(189, 156, 122, 0.6), 0 0 30px rgba(189, 156, 122, 0.4),
       0 0 40px rgba(189, 156, 122, 0.3);
-    color: #EBDEBE;
+    color: #ebdebe;
   }
 
   /* Permanent glow effects */
@@ -269,22 +265,58 @@ body {
   .animate-duration-3s {
     animation-duration: 3s;
   }
-  
+
   .animate-duration-2s {
     animation-duration: 2s;
   }
-  
+
   .animate-duration-4s {
     animation-duration: 4s;
+  }
+
+  /* Added for Shader.tsx optimization */
+  .move-grid-animation {
+    animation: move-grid 80s linear infinite;
+  }
+
+  @keyframes move-grid {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(-40px, -40px);
+    }
   }
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
 }
 
 .animate-shake {
   animation: shake 0.3s ease-in-out;
+}
+
+/* Grid slide animation using background-position for CSS gradients */
+@keyframes grid-slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 50px 50px;
+  }
+}
+
+.animate-grid-slide {
+  animation: grid-slide 2s linear infinite;
+  will-change: background-position;
 }
