@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Toaster } from "sonner";
 import DemoOne from "@/components/ShaderBackground";
+import { Shader } from "./Shader";
 
 type ClientLayoutShellProps = {
   children: React.ReactNode;
@@ -58,7 +59,7 @@ export function ClientLayoutShell({ children }: ClientLayoutShellProps) {
     <>
       {!isEntryPage && (
         <div className="fixed -z-10 h-full w-screen">
-          <DemoOne />
+          <Shader />
         </div>
       )}
       <Toaster theme="system" richColors />
