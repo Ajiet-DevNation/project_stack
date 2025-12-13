@@ -212,10 +212,48 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
             </div>
           </div>
 
+          {/* Likes and View Project Button */}
+          <div className="flex items-center justify-between pt-6">
+            <Button
+              onClick={(e) => {
+                if (onViewProject) {
+                  e.preventDefault();
+                  onViewProject(href);
+                }
+              }}
+              asChild={!onViewProject}
+              className={cn(
+                "h-11 rounded-md px-8 cursor-pointer",
+                "bg-primary text-primary-foreground",
+                "hover:bg-primary/90"
+              )}
+            >
+              {onViewProject ? (
+                <span className="flex items-center">
+                  View Project <ArrowRight className="ml-2 h-4 w-4" />
+                </span>
+              ) : (
+                <Link href={href}>
+                  View Project <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              )}
+            </Button>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <Heart
+                  className="h-5 w-5 text-destructive fill-destructive" // Use destructive red
+                />
+                <span className="text-lg font-bold text-foreground">
+                  {likes}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Tech Stack Section (shown on hover for desktop, on click for mobile) */}
           {techStack.length > 0 && (
             <div className={cn(
-              "transition-all duration-500 ease-in-out overflow-hidden",
+              "transition-all duration-300 ease-in-out overflow-hidden",
               !isMobile && "opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-96 group-hover:mt-8 group-hover:mb-6",
               isMobile && (isExpanded ? "opacity-100 max-h-96 mt-8 mb-6" : "opacity-0 max-h-0")
             )}>
@@ -258,57 +296,7 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
             </div>
           )}
 
-          {/* Bottom Section: Stats and Button (shown on hover for desktop, on click for mobile) */}
-          <div className={cn(
-            "pt-6 border-t border-border transition-all duration-500 ease-in-out overflow-hidden",
-            !isMobile && "opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-32",
-            isMobile && (isExpanded ? "opacity-100 max-h-32" : "opacity-0 max-h-0")
-          )}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <Heart
-                    className="h-5 w-5 text-destructive fill-destructive" // Use destructive red
-                  />
-                  <span className="text-lg font-bold text-foreground">
-                    {likes}
-                  </span>
-                  <span className="text-muted-foreground text-sm">Likes</span>
-                </div>
-                {/* <div className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-blue-400" /> 
-                  <span className="text-lg font-bold text-foreground">
-                    {comments}
-                  </span>
-                  <span className="text-muted-foreground text-sm">Comments</span>
-                </div> */}
-              </div>
-              <Button
-                onClick={(e) => {
-                  if (onViewProject) {
-                    e.preventDefault();
-                    onViewProject(href);
-                  }
-                }}
-                asChild={!onViewProject}
-                className={cn(
-                  "h-11 rounded-md px-8 cursor-pointer",
-                  "bg-primary text-primary-foreground",
-                  "hover:bg-primary/90"
-                )}
-              >
-                {onViewProject ? (
-                  <span className="flex items-center">
-                    View Project <ArrowRight className="ml-2 h-4 w-4" />
-                  </span>
-                ) : (
-                  <Link href={href}>
-                    View Project <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                )}
-              </Button>
-            </div>
-          </div>
+
         </div>
       </div>
     );

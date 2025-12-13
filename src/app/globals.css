@@ -3,6 +3,12 @@
 
 @custom-variant dark (&:is(.dark *)); /* <-- Added from file 1 */
 
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
 /* ============================================
    PRIORITY THEME VARIABLES
    (From file 2, as requested)
