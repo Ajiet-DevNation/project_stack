@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from 'react';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { useToast } from '@/components/ui/toast-1';
-import { clsx } from 'clsx'; 
-import { useSession } from 'next-auth/react';
-import { LoginModal } from './LoginModal';
+import { useState } from "react";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { useToast } from "@/components/ui/toast-1";
+import { clsx } from "clsx";
+import { useSession } from "next-auth/react";
+import { LoginModal } from "./LoginModal";
 
 interface LikeButtonProps {
   projectId: string;
   isInitiallyLiked: boolean;
-  initialLikeCount: number; 
+  initialLikeCount: number;
   disabled?: boolean;
 }
 
@@ -37,7 +37,7 @@ const LikeButton = ({
     if (isLoading || disabled) return;
 
     setIsLoading(true);
-    
+
     // --- 1. STORE PREVIOUS STATE FOR ROLLBACK ---
     const previousLikeState = isLiked;
     const previousLikeCount = likeCount;
@@ -45,18 +45,19 @@ const LikeButton = ({
     // --- 2. OPTIMISTIC UPDATE ---
     // Update both the icon and the count immediately
     setIsLiked(!previousLikeState);
-    setLikeCount(previousLikeState ? previousLikeCount - 1 : previousLikeCount + 1);
+    setLikeCount(
+      previousLikeState ? previousLikeCount - 1 : previousLikeCount + 1
+    );
 
     try {
       // 3. API CALL (same as before)
       const response = await fetch(`/api/projects/${projectId}/like`, {
-        method: 'POST',
+        method: "POST",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update like status');
+        throw new Error("Failed to update like status");
       }
-
     } catch (error) {
       console.error(error);
 
@@ -64,8 +65,7 @@ const LikeButton = ({
       // If the API call fails, revert both states
       setIsLiked(previousLikeState);
       setLikeCount(previousLikeCount);
-      showToast('Failed to update like status', 'error');
-
+      showToast("Failed to update like status", "error");
     } finally {
       setIsLoading(false);
     }
@@ -82,25 +82,23 @@ const LikeButton = ({
           onClick={toggleLike}
           disabled={isDisabled}
           className={clsx(
-            'inline-flex items-center justify-center transition-opacity h-4 w-4', // Added h-4 w-4
+            "inline-flex items-center justify-center transition-opacity h-6 w-6", 
             {
-              'cursor-not-allowed opacity-70': isDisabled,
-              'cursor-pointer': !isDisabled,
+              "cursor-not-allowed opacity-70": isDisabled,
+              "cursor-pointer": !isDisabled,
             }
           )}
-          aria-label={
-            disabled ? 'Login to like' : isLiked ? 'Unlike' : 'Like'
-          }
+          aria-label={disabled ? "Login to like" : isLiked ? "Unlike" : "Like"}
         >
           {isLiked ? (
-            <FaHeart className="text-red-500" />
+            <FaHeart className="text-red-500 w-full h-full" />
           ) : (
-            <FaRegHeart className="text-current" />
+            <FaRegHeart className="text-current w-full h-full" />
           )}
         </button>
-        
+
         {/* Render the likeCount state, which updates instantly */}
-        <span className="text-sm font-medium">{likeCount}</span>
+        <span className="text-lg font-medium">{likeCount}</span>
       </div>
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>

@@ -21,6 +21,7 @@ interface Project {
   projectStatus: "Planning" | "Active" | "Completed";
   isActive: boolean;
   authorId: string;
+  isLiked: boolean;
   author: {
     id: string;
     name: string;
@@ -136,11 +137,13 @@ export default function ProjectCard() {
               ref={index === projects.length - 1 ? lastProjectRef : null}
             >
               <ProjectShowcaseCard
+                projectId={project.id}
                 title={project.title}
                 tagline={`By ${project.author.name}`}
                 description={project.description}
                 status={project.projectStatus}
-                likes={project._count.likes}
+                initialLikeCount={project._count.likes}
+                isInitiallyLiked={project.isLiked}
                 href={`/projects/${project.id}` || "#"}
                 githubUrl={project.githubLink || undefined}
                 onViewProject={handleViewProject}
