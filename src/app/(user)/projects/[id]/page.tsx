@@ -434,7 +434,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                         </div>
                         {project.contributors.length > 0 && (
                           <div className="flex items-center gap-2 text-muted-foreground">
-                            <Users className="h-4 w-4" />
+                            <Users className="h-6 w-6" />
                             <span className="text-sm font-medium">
                               {project.contributors.length}
                             </span>

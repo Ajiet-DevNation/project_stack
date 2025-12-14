@@ -72,6 +72,25 @@ export async function GET(req: Request) {
       ];
     }
 
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+
+    let userLikes: string[] = [];
+    if (userId) {
+      const userProfile = await db.profile.findUnique({
+        where: { userId },
+        select: { id: true }
+      });
+
+      if (userProfile) {
+        const likes = await db.like.findMany({
+          where: { profileId: userProfile.id },
+          select: { projectId: true }
+        });
+        userLikes = likes.map(like => like.projectId);
+      }
+    }
+
     const projects = await db.project.findMany({
       skip: (page - 1) * limit,
       take: limit,
@@ -103,8 +122,14 @@ export async function GET(req: Request) {
       },
     });
 
+    const projectsWithLikes = projects.map(project => ({
+      ...project,
+      isLiked: userLikes.includes(project.id)
+    }));
+
+
     // Custom sort to ensure Active > Planning > Completed
-    const sortedProjects = projects.sort((a, b) => {
+    const sortedProjects = projectsWithLikes.sort((a, b) => {
       const statusOrder: Record<string, number> = {
         'Active': 1,
         'Planning': 2,

@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Github,
 } from "lucide-react";
+import LikeButton from "../LikeButton";
 
 // Status badge component (Left as-is, these are semantic state colors)
 const StatusBadge = ({
@@ -78,11 +79,13 @@ interface TechStackItem {
 
 // Define the props for the ProjectCard component
 interface ProjectCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  projectId: string; // Add projectId here
   title: string;
   tagline: string;
   description: string;
   status: "Planning" | "Active" | "Completed";
-  likes: number;
+  initialLikeCount: number;
+  isInitiallyLiked: boolean;
   // comments: number;
   href: string;
   githubUrl?: string; // Optional GitHub URL
@@ -99,13 +102,15 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
       tagline,
       description,
       status,
-      likes,
+      initialLikeCount,
+      isInitiallyLiked,
       // comments,
       href,
       githubUrl,
       techStack = [],
       isAuthenticated,
       onViewProject,
+      projectId, // Destructure projectId to prevent it from being passed to the div
       ...props
     },
     ref
@@ -121,18 +126,15 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
       };
 
       checkMobile();
-      window.addEventListener('resize', checkMobile);
+      window.addEventListener("resize", checkMobile);
 
-      return () => window.removeEventListener('resize', checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
     // Toggle expansion on mobile
     const handleCardClick = (e: React.MouseEvent) => {
       // Don't toggle if clicking on links or buttons
-      if (
-        isMobile &&
-        !(e.target as HTMLElement).closest('a, button')
-      ) {
+      if (isMobile && !(e.target as HTMLElement).closest("a, button")) {
         setIsExpanded(!isExpanded);
       }
     };
@@ -162,7 +164,6 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
       >
         {/* Content Container */}
         <div className="relative flex h-full flex-col p-6 text-card-foreground">
-
           {/* Top Section: Status Badge and GitHub Link */}
           <div className="flex items-start justify-between mb-6">
             <StatusBadge status={status} />
@@ -240,63 +241,68 @@ const ProjectCard = React.forwardRef<HTMLDivElement, ProjectCardProps>(
             </Button>
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <Heart
-                  className="h-5 w-5 text-destructive fill-destructive" // Use destructive red
+                <LikeButton
+                  projectId={projectId}
+                  isInitiallyLiked={isInitiallyLiked}
+                  initialLikeCount={initialLikeCount}
                 />
-                <span className="text-lg font-bold text-foreground">
-                  {likes}
-                </span>
               </div>
             </div>
           </div>
 
           {/* Tech Stack Section (shown on hover for desktop, on click for mobile) */}
           {techStack.length > 0 && (
-            <div className={cn(
-              "transition-all duration-300 ease-in-out overflow-hidden",
-              !isMobile && "opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-96 group-hover:mt-8 group-hover:mb-6",
-              isMobile && (isExpanded ? "opacity-100 max-h-96 mt-8 mb-6" : "opacity-0 max-h-0")
-            )}>
+            <div
+              className={cn(
+                "transition-all duration-300 ease-in-out overflow-hidden",
+                !isMobile &&
+                  "opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-96 group-hover:mt-8 group-hover:mb-6",
+                isMobile &&
+                  (isExpanded
+                    ? "opacity-100 max-h-96 mt-8 mb-6"
+                    : "opacity-0 max-h-0")
+              )}
+            >
               <h4 className="font-semibold text-foreground mb-2 text-xs tracking-wide">
                 TECH STACK
               </h4>
               <div className="flex flex-wrap gap-3">
-                {techStack.filter(tech => tech && tech.name).map((tech, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "group/tech flex items-center gap-2 px-3 py-2 rounded-lg",
-                      "bg-muted border border-border", // Use muted background
-                      "hover:bg-accent hover:border-input", // Use accent/input for hover
-                      "transition-all duration-200"
-                    )}
-                    title={tech.name}
-                  >
+                {techStack
+                  .filter((tech) => tech && tech.name)
+                  .map((tech, index) => (
                     <div
+                      key={index}
                       className={cn(
-                        "w-5 h-5 flex items-center justify-center",
-                        "text-muted-foreground group-hover/tech:text-foreground",
-                        "transition-colors"
+                        "group/tech flex items-center gap-2 px-3 py-2 rounded-lg",
+                        "bg-muted border border-border", 
+                        "hover:bg-accent hover:border-input", 
+                        "transition-all duration-200"
                       )}
+                      title={tech.name}
                     >
-                      {tech?.icon || null}
+                      <div
+                        className={cn(
+                          "w-5 h-5 flex items-center justify-center",
+                          "text-muted-foreground group-hover/tech:text-foreground",
+                          "transition-colors"
+                        )}
+                      >
+                        {tech?.icon || null}
+                      </div>
+                      <span
+                        className={cn(
+                          "text-xs font-medium",
+                          "text-muted-foreground group-hover/tech:text-foreground",
+                          "transition-colors"
+                        )}
+                      >
+                        {tech.name}
+                      </span>
                     </div>
-                    <span
-                      className={cn(
-                        "text-xs font-medium",
-                        "text-muted-foreground group-hover/tech:text-foreground",
-                        "transition-colors"
-                      )}
-                    >
-                      {tech.name}
-                    </span>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           )}
-
-
         </div>
       </div>
     );
