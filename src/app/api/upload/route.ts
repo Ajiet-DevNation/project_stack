@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     // Upload to Supabase Storage
     // Ensure your bucket in Supabase is named 'images' and is set to Public
     const { error } = await supabaseAdmin.storage
-      .from("project_images")
+      .from(process.env.SUPABASE_IMAGE_BUCKET!)
       .upload(fileName, buffer, {
         contentType: file.type,
         upsert: false,
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
 
     // Get the Public URL
     const { data: { publicUrl } } = supabaseAdmin.storage
-      .from("project_images")
+      .from(process.env.SUPABASE_IMAGE_BUCKET!)
       .getPublicUrl(fileName);
 
     return NextResponse.json({ url: publicUrl });
