@@ -1,0 +1,27 @@
+name: Keep-Alive
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate random sleep duration
+        id: random_sleep
+        run: |
+          RANDOM_SECONDS=$(( RANDOM % 1800 ))
+          echo "Random sleep duration: ${RANDOM_SECONDS} seconds"
+          echo "random_seconds=${RANDOM_SECONDS}" >> $GITHUB_OUTPUT
+
+      - name: Sleep for random duration
+        run: sleep ${{ steps.random_sleep.outputs.random_seconds }}
+        shell: bash
+
+      - name: Call keep-alive API on Vercel backend
+        run: curl -X POST ${{ secrets.VERCEL_URL }}/api/keep-alive
