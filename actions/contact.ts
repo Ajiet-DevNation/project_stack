@@ -49,7 +49,7 @@ export async function sendContactEmail(data: ContactFormData) {
         message: `Rate limit exceeded. Try again after ${hoursUntilReset} hour(s).`,
       };
     }
-  
+
     const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -181,23 +181,8 @@ export async function sendContactEmail(data: ContactFormData) {
 
 
     await resend.emails.send({
-      from: "onboarding@resend.dev", 
-      to: process.env.CONTACT_EMAIL_0 ?? "your-email@example.com",
-      subject: `Contact Form: ${data.subject}`,
-      html,
-      text: `
-New Contact Submission
-Name: ${data.name}
-Email: ${data.email}
-Subject: ${data.subject}
-
-Message:
-${data.message}
-`,
-    });
-    await resend.emails.send({
-      from: "onboarding@resend.dev", 
-      to: process.env.CONTACT_EMAIL_1 ?? "your-email@example.com",
+      from: "onboarding@resend.dev",
+      to: process.env.CONTACT_EMAIL_0!,
       subject: `Contact Form: ${data.subject}`,
       html,
       text: `

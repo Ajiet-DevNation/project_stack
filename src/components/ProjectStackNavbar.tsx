@@ -84,50 +84,51 @@ export function ProjectStackDock({
       <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none z-20">
         <Dock
           className={cn(
-            "w-full max-w-7xl justify-between px-4 rounded-2xl",
+            "w-full max-w-7xl justify-between px-2 sm:px-4 rounded-2xl",
             "pointer-events-auto shadow-lg",
             "bg-card/50 backdrop-blur-md border border-border"
           )}
-          magnification={62}
-          distance={111}
-          panelHeight={58}
+          magnification={isMobile ? 50 : 62}
+          distance={isMobile ? 80 : 111}
+          panelHeight={isMobile ? 50 : 58}
         >
           <DockItem
-            baseWidth={isMobile ? 60 : 180}
-            magnification={isMobile ? 60 : 180}
+            baseWidth={isMobile ? 50 : 180}
+            magnification={isMobile ? 50 : 180}
           >
             <DockIcon>
               <DockLogo />
             </DockIcon>
+            {!isMobile && <DockLabel>Home</DockLabel>}
           </DockItem>
 
           <div className="-grow" />
 
-          <DockItem>
+          <DockItem baseWidth={isMobile ? 45 : 64}>
             <DockIcon>
               <button className="cursor-pointer" onClick={onOpenCreateModal}>
-                <Plus />
+                <Plus className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </DockIcon>
-            <DockLabel>Create</DockLabel>
+            {!isMobile && <DockLabel>Create</DockLabel>}
           </DockItem>
 
-          <DockItem>
+          <DockItem baseWidth={isMobile ? 45 : 64}>
             <DockIcon>
               <button className="cursor-pointer" onClick={toggleSearch}>
-                <Search />
+                <Search className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </DockIcon>
-            <DockLabel>Search</DockLabel>
+            {!isMobile && <DockLabel>Search</DockLabel>}
           </DockItem>
 
-          <DockItem>
+          <DockItem baseWidth={isMobile ? 45 : 64}>
             <DockIcon>
               <button
                 className="cursor-pointer relative"
                 onClick={() => setShowInbox(true)}
               >
-                <Inbox />
+                <Inbox className="w-5 h-5 md:w-6 md:h-6" />
                 {notificationCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                     {notificationCount > 9 ? "9+" : notificationCount}
@@ -135,16 +136,16 @@ export function ProjectStackDock({
                 )}
               </button>
             </DockIcon>
-            <DockLabel>Inbox</DockLabel>
+            {!isMobile && <DockLabel>Inbox</DockLabel>}
           </DockItem>
 
-          <DockItem>
+          <DockItem baseWidth={isMobile ? 45 : 64}>
             <DockIcon>
               <Link
                 href={profileId ? `/profile/${profileId}` : "/profile"}
                 className="cursor-pointer"
               >
-                <div className="relative w-8 h-8 rounded-full border-2 border-gray-400 overflow-hidden bg-black/20 flex items-center justify-center">
+                <div className="relative w-8 h-8 md:w-9 md:h-9 rounded-full border-2 border-gray-400 overflow-hidden bg-black/20 flex items-center justify-center">
                   {userImage ? (
                     <Image
                       src={userImage}
@@ -161,7 +162,7 @@ export function ProjectStackDock({
                 </div>
               </Link>
             </DockIcon>
-            <DockLabel>Profile</DockLabel>
+            {!isMobile && <DockLabel>Profile</DockLabel>}
           </DockItem>
         </Dock>
       </div>
