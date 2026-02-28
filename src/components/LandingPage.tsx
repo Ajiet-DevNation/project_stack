@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Sparkles, Users, Lightbulb, ArrowRight } from "lucide-react";
+import { Sparkles, Users, Lightbulb, ArrowRight, Target, Zap, Shield, Star, ChevronRight, BarChart3, Clock } from "lucide-react";
 import FAQSection from "./FAQSection";
 import SpiralAnimation from "./SpiralAnimation";
+import Footer from "./Footer";
 
 interface LandingPageProps {
   onGetStarted?: () => void;
@@ -29,9 +30,8 @@ export default function LandingPage({
         <SpiralAnimation />
       </div>
 
-      {/* Overlay gradient for better text readability */}
       <div
-        className="fixed inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/80 pointer-events-none"
+        className="fixed inset-0 bg-background/60 pointer-events-none"
         style={{ zIndex: 1 }}
       ></div>
 
@@ -56,7 +56,7 @@ export default function LandingPage({
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
                 <span className="text-foreground">Your Next Big Project</span>
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary/80 animate-in slide-in-from-left duration-700 delay-400">
+                <span className="text-primary animate-in slide-in-from-left duration-700 delay-400">
                   Starts Here
                 </span>
               </h1>
@@ -120,6 +120,14 @@ export default function LandingPage({
         {/* Features Section */}
         <section className="py-20 px-4 pointer-events-auto animate-in fade-in-up delay-1000">
           <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Everything You Need to Succeed
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Powerful features designed to help you collaborate, create, and launch amazing projects.
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Feature 1 */}
               <div className="group bg-card/80 backdrop-blur-md border border-border/50 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover-lift hover:border-primary/30">
@@ -166,10 +174,60 @@ export default function LandingPage({
           </div>
         </section>
 
-        {/* FAQ Section */}
+        {/* Additional Features Grid */}
+        <section className="py-20 px-4 pointer-events-auto animate-in fade-in-up delay-1100">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="space-y-8">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Target className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Project Matching</h3>
+                    <p className="text-muted-foreground">Smart algorithms that connect you with the perfect teammates based on skills and interests.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Real-time Collaboration</h3>
+                    <p className="text-muted-foreground">Work together seamlessly with integrated tools for communication and project management.</p>
+                  </div>
+                </div>
+                
+              </div>
+              <div className="space-y-8">
+               
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Skill Development</h3>
+                    <p className="text-muted-foreground">Build your portfolio and gain valuable experience through hands-on project work.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Flexible Timeline</h3>
+                    <p className="text-muted-foreground">Work at your own pace with projects that fit your schedule and academic commitments.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <div className="pointer-events-auto">
           <FAQSection />
         </div>
+        <Footer/>
       </div>
     </div>
   );

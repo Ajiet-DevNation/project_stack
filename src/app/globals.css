@@ -194,6 +194,11 @@ body {
     animation: float 3s ease-in-out infinite;
   }
 
+  /* Slow spin animation for decorative elements */
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+
   @keyframes float {
     0%,
     100% {
@@ -201,6 +206,15 @@ body {
     }
     50% {
       transform: translateY(-10px);
+    }
+  }
+
+  @keyframes spin-slow {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
     }
   }
 
@@ -312,7 +326,20 @@ body {
   animation: shake 0.3s ease-in-out;
 }
 
-/* Grid slide animation using background-position for CSS gradients */
+/* Enhanced close button styling for dialogs */
+  [data-slot="dialog-close"] {
+    cursor: pointer !important;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  [data-slot="dialog-close"]:hover {
+    border-radius: 50% !important;
+    background-color: hsl(var(--muted)) !important;
+    transform: scale(1.1) !important;
+  }
+
+  /* Grid slide animation using background-position for CSS gradients */
 @keyframes grid-slide {
   from {
     background-position: 0 0;

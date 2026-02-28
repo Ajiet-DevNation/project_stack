@@ -3,10 +3,10 @@ import { usePathname } from "next/navigation";
 import { ProjectStackDock } from "@/components/ProjectStackNavbar";
 import { CreateProjectModal } from "@/components/CreateProjectModal";
 import { LoginModal } from "@/components/LoginModal";
+import { FloatingContactButton } from "@/components/FloatingContactButton";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Toaster } from "sonner";
-import DemoOne from "@/components/ShaderBackground";
 import { Shader } from "./Shader";
 
 type ClientLayoutShellProps = {
@@ -44,7 +44,6 @@ export function ClientLayoutShell({ children }: ClientLayoutShellProps) {
 
   const handleCreateClick = () => {
     if (session) {
-      // Check if user is onboarded (profileId is set)
       if (!profileId) {
         window.location.href = "/onboarding";
         return;
@@ -71,6 +70,7 @@ export function ClientLayoutShell({ children }: ClientLayoutShellProps) {
           userImage={session?.user?.image}
         />
       )}
+      <FloatingContactButton />
       <CreateProjectModal
         open={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
