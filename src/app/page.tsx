@@ -9,16 +9,22 @@ export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [loginOpen, setLoginOpen] = useState(searchParams.get("login") === "true");
+  const [loginOpen, setLoginOpen] = useState(searchParams.get("login") === "true" && !session);
 
   useEffect(() => {
-    if (searchParams.get("login") === "true") {
+    if (searchParams.get("login") === "true" && session) {
+      router.replace("/home", { scroll: false });
+    } else if (searchParams.get("login") === "true") {
       router.replace("/", { scroll: false });
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, session]);
 
   const handleGetStarted = () => {
-    setLoginOpen(true);
+    if (session) {
+      router.push("/home");
+    } else {
+      setLoginOpen(true);
+    }
   };
 
   const handleExploreProjects = () => {
