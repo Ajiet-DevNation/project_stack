@@ -147,18 +147,50 @@ function ProfileContent({ profileId }: ProfileContentProps) {
           <Card className="border border-border/20 bg-background/20 backdrop-blur-sm mb-8">
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                >
-                  <Avatar className="w-24 h-24 border-4 border-primary/20">
-                    <AvatarImage src={isOwnProfile ? session?.user?.image ?? profile.image ?? undefined : profile.image ?? undefined} alt={profile.name} />
-                    <AvatarFallback className="text-2xl font-semibold bg-primary/10">
-                      {profile.name?.split(" ").map(n => n[0]).join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                </motion.div>
+                {/* Avatar and mobile action buttons row */}
+                <div className="flex items-start justify-between w-full md:w-auto">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  >
+                    <Avatar className="w-24 h-24 border-4 border-primary/20">
+                      <AvatarImage src={isOwnProfile ? session?.user?.image ?? profile.image ?? undefined : profile.image ?? undefined} alt={profile.name} />
+                      <AvatarFallback className="text-2xl font-semibold bg-primary/10">
+                        {profile.name?.split(" ").map(n => n[0]).join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                  </motion.div>
+
+                  {/* Mobile action buttons - visible only on small screens */}
+                  {isOwnProfile && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5 }}
+                      className="flex items-center gap-2 md:hidden"
+                    >
+                      <Button
+                        onClick={() => setIsEditModalOpen(true)}
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 border-border/40 bg-background/50 rounded-sm hover:bg-primary/5 hover:border-primary/10 cursor-pointer"
+                        title="Edit Profile"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        onClick={() => signOut()}
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 border-border/40 bg-background/50 rounded-full cursor-pointer hover:bg-red-500/5 hover:border-red-500/10 hover:text-red-500"
+                        title="Sign Out"
+                      >
+                        <LogOut className="w-4 h-4" />
+                      </Button>
+                    </motion.div>
+                  )}
+                </div>
 
                 <div className="flex-1 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -209,21 +241,25 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                         initial={{ opacity: 0, scale: 0 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.5 }}
-                        className="flex flex-col gap-4"
+                        className="hidden md:flex items-center gap-2"
                       >
                         <Button
                           onClick={() => setIsEditModalOpen(true)}
-                          className="bg-primary/80 cursor-pointer hover:bg-primary/90 backdrop-blur-sm"
+                          variant="outline"
+                          size="icon"
+                          className="h-9 w-9 border-border/40 bg-background/50 rounded-sm hover:bg-primary/5 hover:border-primary/10 cursor-pointer"
+                          title="Edit Profile"
                         >
-                          <Edit3 className="w-4 h-4 mr-2" />
-                          Edit Profile
+                          <Edit3 className="w-4 h-4" />
                         </Button>
                         <Button
                           onClick={() => signOut()}
-                          className="bg-primary/80 hover:bg-primary/90 backdrop-blur-sm"
+                          variant="outline"
+                          size="icon"
+                          className="h-9 w-9 border-border/40 bg-background/50 rounded-full cursor-pointer hover:bg-red-500/5 hover:border-red-500/10 hover:text-red-500"
+                          title="Sign Out"
                         >
-                          <LogOut className="w-4 h-4 mr-2" />
-                          Sign-Out
+                          <LogOut className="w-4 h-4" />
                         </Button>
                       </motion.div>
                     )}
@@ -247,7 +283,7 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.7 }}
                     >
-                      <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <h3 className="text-sm font-medium text-foreground flex items-center mb-3 gap-2">
                         <Code className="w-4 h-4" />
                         Skills
                       </h3>
