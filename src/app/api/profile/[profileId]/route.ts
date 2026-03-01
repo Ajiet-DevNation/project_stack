@@ -25,6 +25,21 @@ export async function GET(
       return new Response("Profile not found", { status: 404 });
     }
 
+    // 3b. Fetch projects with their counts separately
+    const projectsWithCounts = await db.project.findMany({
+      where: { authorId: validatedProfileId },
+      orderBy: { postedOn: "desc" },
+      include: {
+        _count: {
+          select: {
+            likes: true,
+            contributors: true,
+          },
+        },
+      },
+    });
+    profile.projects = projectsWithCounts as any;
+
     return new Response(JSON.stringify(profile), { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {

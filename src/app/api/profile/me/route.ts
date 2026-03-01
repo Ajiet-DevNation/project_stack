@@ -3,6 +3,53 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
 import { z } from "zod"
 
+export async function GET(req: Request) {
+  try {
+    // 1. Authenticate the user
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 })
+    }
+
+    // 2. Fetch the current user's profile with projects
+    const profile = await db.profile.findUnique({
+      where: {
+        userId: session.user.id,
+      },
+      include: {
+        projects: {
+          orderBy: { postedOn: "desc" },
+        },
+      },
+    })
+
+    // 3. Handle the case where the profile is not found
+    if (!profile) {
+      return new Response(JSON.stringify({ message: "Profile not found" }), { status: 404 })
+    }
+
+    // 2b. Fetch projects with their counts separately
+    const projectsWithCounts = await db.project.findMany({
+      where: { authorId: profile.id },
+      orderBy: { postedOn: "desc" },
+      include: {
+        _count: {
+          select: {
+            likes: true,
+            contributors: true,
+          },
+        },
+      },
+    })
+    profile.projects = projectsWithCounts as any
+
+    return new Response(JSON.stringify(profile), { status: 200 })
+  } catch (error) {
+    console.error("GET /api/profile/me error:", error)
+    return new Response(JSON.stringify({ message: "Internal Server Error" }), { status: 500 })
+  }
+}
+
 // This allows partial updates without strict field requirements
 const updateProfileSchema = z
   .object({
@@ -52,8 +99,37 @@ export async function PUT(req: Request) {
       data: updateData,
     })
 
+    // 5. Fetch the updated profile with projects
+    const profileWithCounts = await db.profile.findUnique({
+      where: {
+        userId: session.user.id,
+      },
+      include: {
+        projects: {
+          orderBy: { postedOn: "desc" },
+        },
+      },
+    })
+
+    // 5b. Fetch projects with their counts separately
+    if (profileWithCounts) {
+      const projectsWithCounts = await db.project.findMany({
+        where: { authorId: profileWithCounts.id },
+        orderBy: { postedOn: "desc" },
+        include: {
+          _count: {
+            select: {
+              likes: true,
+              contributors: true,
+            },
+          },
+        },
+      })
+      profileWithCounts.projects = projectsWithCounts as any
+    }
+
     console.log("Profile updated successfully:", updatedProfile)
-    return new Response(JSON.stringify(updatedProfile), { status: 200 })
+    return new Response(JSON.stringify(profileWithCounts), { status: 200 })
   } catch (error) {
     console.error("PUT /api/profile/me error:", error)
 

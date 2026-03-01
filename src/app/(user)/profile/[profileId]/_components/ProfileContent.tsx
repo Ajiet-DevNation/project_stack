@@ -350,7 +350,6 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                             startDate: project.startDate ? new Date(project.startDate).toISOString() : undefined,
                             requiredSkills: project.requiredSkills || [],
                             likes: project._count?.likes || 0,
-                            comments: project._count?.comments || 0,
                             contributors: project._count?.contributors || 0
                           }}
                         />
@@ -400,7 +399,6 @@ function ProfileContent({ profileId }: ProfileContentProps) {
                             requiredSkills: contribution.project.requiredSkills || [],
                             startDate: contribution.project.startDate ? new Date(contribution.project.startDate).toISOString() : undefined,
                             likes: contribution.project._count?.likes || 0,
-                            comments: contribution.project._count?.comments || 0,
                             contributors: contribution.project._count?.contributors || 0
                           }}
                         />

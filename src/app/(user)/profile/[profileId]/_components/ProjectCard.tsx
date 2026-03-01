@@ -7,7 +7,6 @@ import {
   ExternalLink, 
   Github, 
   Heart, 
-  MessageCircle, 
   Users, 
   Calendar,
   Eye,
@@ -30,7 +29,6 @@ export interface Project {
   postedOn: string
   isActive?: boolean
   likes: number
-  comments: number
   contributors: number
 }
 
@@ -127,10 +125,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <div className="flex items-center gap-1">
               <Heart className="w-3.5 h-3.5" />
               <span>{project.likes || 0}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>{project.comments || 0}</span>
             </div>
             <div className="flex items-center gap-1">
               <Users className="w-3.5 h-3.5" />
