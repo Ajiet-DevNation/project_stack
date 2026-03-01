@@ -179,19 +179,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <>
-      <main className="relative min-h-screen pb-20">
-        <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-10">
-          <div className="w-full px-4 py-4 sm:px-6 lg:px-8">
-            <nav>
-              <Link
-                href="/home"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                ← Back to Projects
-              </Link>
-            </nav>
-          </div>
-        </header>
+      <main className="relative min-h-screen pb-5 md:pt-10">
 
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -232,7 +220,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </section>
               )}
 
-              {/* Project Timeline Card - Moved Here */}
               <section className="bg-card/60 backdrop-blur-sm border border-border rounded-xl p-8 shadow-xl fade-in-up">
                 <h2 className="text-xl font-semibold text-foreground mb-6 pb-3 border-b border-border/50">
                   Project Timeline
@@ -284,7 +271,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </div>
               </section>
 
-              {/* About Section */}
               <section className="bg-card/60 backdrop-blur-sm border border-border rounded-xl p-8 shadow-xl fade-in-up delay-100">
                 <h2 className="text-2xl font-semibold text-foreground mb-6 pb-3 border-b border-border/50">
                   About
@@ -296,7 +282,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     </p>
                   </div>
 
-                  {/* Required Skills in About Section */}
                   <div className="pt-4">
                     <h3 className="text-base font-semibold text-foreground mb-4">
                       Required Skills
@@ -315,7 +300,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </div>
               </section>
 
-              {/* Contributors Section */}
               {project.contributors.length > 0 && (
                 <section className="bg-card/60 backdrop-blur-sm border border-border rounded-xl p-8 shadow-xl fade-in-up delay-200">
                   <h2 className="text-xl font-semibold text-foreground mb-6 pb-3 border-b border-border/50">
@@ -356,12 +340,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               )}
             </div>
 
-            {/* Sidebar Column - FIXED STICKY */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
-                {/* Project Header Card */}
                 <div className="bg-card/60 backdrop-blur-sm border border-border rounded-xl shadow-xl fade-in-up">
-                  {/* Status Badge with Settings */}
                   <div className="p-6 border-b border-border/50">
                     <div className="flex items-center justify-between mb-4">
                       <span
@@ -388,7 +369,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       {project.description}
                     </p>
                   </div>
-                  {/* Creator Section */}
                   <div className="p-6 border-b border-border/50">
                     <div className="flex items-center gap-3">
                       <Link href={`/profile/${project.creator.id}`}>
@@ -420,7 +400,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     </div>
                   </div>
 
-                  {/* Stats Section */}
                   <div className="p-6 border-b border-border/50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
@@ -444,7 +423,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     </div>
                   </div>
 
-                  {/* Primary Action Section */}
                   <div className="p-6">
                     {isProjectOwner ? (
                       <Link
@@ -472,7 +450,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </div>
                 </div>
 
-                {/* Links Card */}
+                
                 {(project.liveUrl || project.githubUrl) && (
                   <div className="bg-card/60 backdrop-blur-sm border border-border rounded-xl p-6 shadow-xl fade-in-up delay-100">
                     <h3 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">
