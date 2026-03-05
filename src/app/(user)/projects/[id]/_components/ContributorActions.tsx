@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserMinus, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { deleteContributor, leaveProject } from "../../../../../../actions/contributors";
+import { deleteContributor, leaveProject } from "@actions/contributors";
 
 interface ContributorActionsProps {
     contributorId: string; 
