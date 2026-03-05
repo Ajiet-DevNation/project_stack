@@ -10,6 +10,7 @@ import { db } from "@/lib/prisma";
 import { ApplyButton } from "../_components/ApplyButton";
 import LikeButton from "@/components/LikeButton";
 import { SettingsDropdown } from "./_components/SettingsDropdown";
+import { ContributorsSection } from "./_components/ContributorsSection";
 import { UserRoundCog } from "lucide-react";
 
 interface ProjectPageProps {
@@ -166,6 +167,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     endDate: apiProject.endDate,
     contributors: apiProject.contributors.map((c) => ({
       id: c.user.id,
+      contributorRecordId: c.id, // The Contributor table record ID
       name: c.user.name,
       avatar: c.user.image || undefined,
     })),
@@ -301,42 +303,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </section>
 
               {project.contributors.length > 0 && (
-                <section className="bg-card/60 backdrop-blur-sm border border-border rounded-xl p-8 shadow-xl fade-in-up delay-200">
-                  <h2 className="text-xl font-semibold text-foreground mb-6 pb-3 border-b border-border/50">
-                    Contributors ({project.contributors.length})
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {project.contributors.map((contributor) => (
-                      <Link
-                        key={contributor.id}
-                        href={`/profile/${contributor.id}`}
-                        className="flex items-center gap-4 p-4 rounded-xl transition-all hover:bg-white/5 hover:shadow-md backdrop-blur-sm"
-                      >
-                        {contributor.avatar ? (
-                          <Image
-                            src={contributor.avatar}
-                            alt={contributor.name}
-                            width={48}
-                            height={48}
-                            className="h-12 w-12 rounded-full bg-muted border-2 border-border shadow-sm"
-                          />
-                        ) : (
-                          <div className="h-12 w-12 rounded-full bg-muted border-2 border-border flex items-center justify-center text-muted-foreground font-semibold shadow-sm">
-                            {contributor.name.charAt(0)}
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-foreground truncate">
-                            {contributor.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Contributor
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
+                <ContributorsSection
+                  contributors={project.contributors}
+                  projectId={project.id}
+                  currentUserProfileId={currentUserProfile?.id}
+                  authorProfileId={apiProject.authorId}
+                />
               )}
             </div>
 
