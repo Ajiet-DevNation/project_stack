@@ -1,5 +1,5 @@
 import ProjectCard from "@/components/ProjectCard";
-import CollapsibleHeader from "@/components/CollapseHeadbar"; // Ensure this path is correct
+import CollapsibleHeader from "@/components/CollapseHeadbar"; 
 
 export default function Home() {
   return (
