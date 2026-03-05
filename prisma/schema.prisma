@@ -61,7 +61,7 @@ model Profile {
   image         String?
   section       String
   branch        String
-  college       String        @default("Not Set")
+  college       String?
   year          String
   skills        String[]
   bio           String?
